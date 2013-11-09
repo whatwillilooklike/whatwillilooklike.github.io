@@ -55,10 +55,11 @@ class RedditFetcher:
                     'highest', 'getting', 'mo', 'achieved', 'realize', 'far',
                     'long', 'bikini', 'guys', 'conscious', 'photos',
                     'carb', 'waist', 'maintain', 'kept', 'proof', 'anyone', 'size',
-                    'eat', 'eating', 'post', 'journey', 'thong', 'underwear', 'bra',
+                    'eat', 'eating', 'post', 'journey', 'went', 'down',
                     'heaviest', 'ago', 'diet', 'keep', 'approx', 'lifting', 'lift',
                     'pictures', 'between', 'school', 'girl', 'girls',
-                    'dedication', 'confidence', 'girl friend', 'boy friend']
+                    'dedication', 'confidence', 'girl friend', 'boy friend',
+                    'bulimia', 'anorexia']
     for search_term in search_terms:
       submissions = self.r.search(search_term, subreddit, 'new', None, 'all')
       self.__update_given_submissions(submissions)
@@ -66,6 +67,9 @@ class RedditFetcher:
       submissions = self.r.search(search_term, subreddit, 'top', None, 'all')
       self.__update_given_submissions(submissions)
       print "Added", self.image_manager.rows_written, "new entries after (top) search for", search_term
+
+    # TODO: add all posts by all the users in the given subreddits
+
 
 
     # TODO: get the newest after a submission id
@@ -75,7 +79,7 @@ class RedditFetcher:
 
   def update_posts(self):
     #submissions = r.get_subreddit('python').get_top(limit=10)
-    subreddits = ['progresspics', 'loseit', 'nakedprogress']
+    subreddits = ['progresspics', 'loseit', 'nakedprogress', 'brogress']
     for subreddit in subreddits:
       self.update_subreddit(subreddit)
 

@@ -22,7 +22,7 @@ class DatabaseManager:
   def query(self, query):
     c = self.conn.cursor()
     c.execute(query)
-    return [Submission(x) for x in c.fetchall()]
+    return c.fetchall()
 
   def insert_submission(self, submission, replace_if_exists):
     # Insert a row of data
