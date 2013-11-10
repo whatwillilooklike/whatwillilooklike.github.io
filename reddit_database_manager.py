@@ -24,21 +24,24 @@ class DatabaseManager:
     c.execute(query)
     return c.fetchall()
 
-  def insert_submission(self, submission, replace_if_exists):
-    # Insert a row of data
+  def replace_submission(self, submission):
+    """ This is a seprate function because this is dangerous"""
     c = self.conn.cursor()
-    if self.row_exists(submission.id) and not replace_if_exists:
-      # print "Submission with id =", submission.id, "already exists."
-      return
-
-    # TODO: handle care when replace_if_exists = True
     # print submission.to_tuple()
-    c.execute("INSERT INTO submissions VALUES ("
+    c.execute("INSERT OR REPLACE INTO submissions VALUES ("
               "?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
               submission.to_tuple())
     self.conn.commit()
     self.rows_written += 1
     print "Added a new entry."
+
+  def insert_submission(self, submission, replace_if_exists):
+    # Insert a row of data
+    if self.row_exists(submission.id):
+      # print "Submission with id =", submission.id, "already exists."
+      return
+    self.replace_submission(submission)
+
 
   def row_exists(self, row_id):
     c = self.conn.cursor()
