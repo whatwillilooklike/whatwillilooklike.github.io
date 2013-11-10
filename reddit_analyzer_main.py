@@ -133,6 +133,7 @@ class RedditAnalyzer:
       return gender
     return None
 
+  @staticmethod
   def __check_proper_gah(string_to_search):
     # Check for the gah (gender / height / age) when formatted as: M/28/5'7"
     re_string = "((m|f|male|female)/\d+/\d+'\d+)"
@@ -146,7 +147,7 @@ class RedditAnalyzer:
       # self.debug_str = gah_str
       result = search("{gender}/{age:d}/{feet:d}'{in:d}", gah_str)
       # print result.named
-      rvalue['gender_is_female'] = self.__gender_from_string(result.named['gender'])
+      rvalue['gender_is_female'] = RedditAnalyzer.__gender_from_string(result.named['gender'])
       rvalue['age'] = result.named['age']
       rvalue['height_in'] = result.named['feet'] * 12 + result.named['in']
       HITS_stats['check_proper_gah'] += 1
@@ -181,7 +182,7 @@ class RedditAnalyzer:
   def __get_weights(self):
     """ Gets the current and (if applicable) previous weight"""
 
-    weight = __simple_greater_than_search(self.title)
+    weight = RedditAnalyzer.__simple_greater_than_search(self.title)
 
     return None
 
