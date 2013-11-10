@@ -12,7 +12,7 @@ from parse import parse,search
 DATABASE_PATH = "reddit_submissions.sqlite"
 HITS_stats = {'check_proper_gah': 0, 'gender_finder': 0,
               'height_finder': 0, 'height_inches': 0,
-              'height_cm': 0}
+              'height_cm': 0, 'weight_identification': 0}
 
 # check this out for reg ex's:
 # https://pythex.org/
@@ -48,7 +48,7 @@ class RedditAnalyzer:
       result.append("current weight(lbs):" + str(self.current_weight))
 
 
-    return ','.join(result)
+    return ', '.join(result)
 
   @staticmethod
   def __gender_from_string(gender_str):
@@ -174,28 +174,62 @@ class RedditAnalyzer:
     return
 
   @staticmethod
-  def __simple_greater_than_search(string_to_search):
-    result = None
+  def reasonable_weight(weight):
+    if weight < 80:
+      return False
+    if weight > 400:
+      return False
+    return True
 
-    return result
+
+  @staticmethod
+  def __simple_greater_than_or_hyphen_search(string_to_search):
+    # search for two numbers seperated by a > symbol
+    re_string = "(\d+\.?\d*)(\D*)(&gt;|-|to)\D*(\d+\.?\d*)\s*(\w*)"
+    regex = re.compile(re_string)
+    matches = regex.findall(string_to_search, re.IGNORECASE)
+    # print matches
+    if matches:
+      for match in matches:
+        previous = float(match[0])
+        current = float(match[3])
+        # print "previous: ", previous, "current:", current
+        if (RedditAnalyzer.reasonable_weight(previous) and
+            RedditAnalyzer.reasonable_weight(current)):
+          # print "previous: ", previous, "current:", current
+          HITS_stats['weight_identification'] += 1
+          return {'previous_weight': previous, 'current_weight': current}
+
+        # print match
+    # exit()
+    # result = None
+    # time.sleep(4)
+
+    return None
 
   def __get_weights(self):
     """ Gets the current and (if applicable) previous weight"""
 
-    weight = RedditAnalyzer.__simple_greater_than_search(self.title)
-
+    weight_rvalue = RedditAnalyzer.__simple_greater_than_or_hyphen_search(self.title)
+    if weight_rvalue is not None:
+      self.previous_weight = weight_rvalue['previous_weight']
+      self.current_weight = weight_rvalue['current_weight']
+    # time.sleep(4)
     return None
 
   def analyze_input(self):
-    # global HITS_stats
+    """ Only the functions directly called from this function should be
+    instance methods. Others should be static to limit the number of
+    places that instance variables are modified
+    """
 
-    # Step 1: Find the gender
+    # Step 1: Find the gender, age, and height
     self.__get_gender_age_height()
 
-    # Step 2: Find the
-    # else, try other ways to search for weight, and height
+    # Step 2: Find the weights (current and previous if applicable)
     self.__get_weights()
 
+    # Step 3:
     # self.__check_proper_gah_parse()
 
   def get_stats(self):
