@@ -98,10 +98,12 @@ class RedditAnalyzer:
   def __height_finder(string_to_search):
     simple_result = RedditAnalyzer.__simple_height_finder_inches(string_to_search)
     if simple_result is not None:
+      HITS_stats['height_finder'] += 1
       return simple_result
 
     simple_result = RedditAnalyzer.__simple_height_finder_cm(string_to_search)
     if simple_result is not None:
+      HITS_stats['height_finder'] += 1
       return simple_result
 
     """
@@ -127,48 +129,60 @@ class RedditAnalyzer:
       gender_str = ''.join(c for c in match_str if c.isalpha())  # remove preceding / trailing (/ or ()
       # print gender_str
       gender = RedditAnalyzer.__gender_from_string(gender_str)
+      HITS_stats['gender_finder'] += 1
       return gender
     return None
 
-  def __check_proper_gah(self):
+  def __check_proper_gah(string_to_search):
     # Check for the gah (gender / height / age) when formatted as: M/28/5'7"
     re_string = "((m|f|male|female)/\d+/\d+'\d+)"
     regex = re.compile(re_string, re.IGNORECASE)
     # print regex.match(submission.tti)
-    match = regex.search(self.title)
+    match = regex.search(string_to_search)
     if match:
+      rvalue = {}
       gah_str = match.group(0)
       # print gah_str
       # self.debug_str = gah_str
       result = search("{gender}/{age:d}/{feet:d}'{in:d}", gah_str)
       # print result.named
-      self.gender_is_female = self.__gender_from_string(result.named['gender'])
-      self.age = result.named['age']
-      self.height_in = result.named['feet'] * 12 + result.named['in']
-      return True
-    return False
+      rvalue['gender_is_female'] = self.__gender_from_string(result.named['gender'])
+      rvalue['age'] = result.named['age']
+      rvalue['height_in'] = result.named['feet'] * 12 + result.named['in']
+      HITS_stats['check_proper_gah'] += 1
+      return rvalue
+    return None
     # TODO: use the parse module to read the stuff from the string (ie. scanf equivalent)
 
-
   def __get_gender_age_height(self):
-    if self.__check_proper_gah():
-      # TODO: other methods are static except this....is that OK?
-      HITS_stats['check_proper_gah'] += 1
+    gah_result = self.__check_proper_gah(self.title)
+    if gah_result is not None:
+      self.gender_is_female = gah_result['gender_is_female']
+      self.age = gah_result['age']
+      self.height_in = gah_result['height_in']
     else:
       # TODO: other ways to find this information
       gender = self.__gender_finder(self.title)
       if gender is not None:
         self.gender_is_female = gender
-        HITS_stats['gender_finder'] += 1
 
       height = self.__height_finder(self.title)
       if height is not None:
         self.height_in = height
-        HITS_stats['height_finder'] += 1
+
     return
+
+  @staticmethod
+  def __simple_greater_than_search(string_to_search):
+    result = None
+
+    return result
 
   def __get_weights(self):
     """ Gets the current and (if applicable) previous weight"""
+
+    weight = __simple_greater_than_search(self.title)
+
     return None
 
   def analyze_input(self):
