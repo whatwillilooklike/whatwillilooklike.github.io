@@ -3,13 +3,16 @@ __author__ = 'kyedidi'
 # import praw
 # import nltk
 import re
+import time
 from reddit_database_manager import DatabaseManager
 from reddit_submission import Submission
 
 from parse import parse,search
 
 DATABASE_PATH = "reddit_submissions.sqlite"
-HITS_check_proper_gah = 0
+HITS_stats = {'check_proper_gah': 0, 'gender_finder': 0,
+              'height_finder': 0, 'height_inches': 0,
+              'height_cm': 0}
 
 # check this out for reg ex's:
 # https://pythex.org/
@@ -21,6 +24,9 @@ class RedditAnalyzer:
     self.height_in = None
     self.age = None
     self.gender_is_female = None
+
+    self.previous_weight = None
+    self.current_weight = None
 
     self.analyze_input()
     # self.is_complete = check_if_complete()
@@ -36,6 +42,12 @@ class RedditAnalyzer:
     if self.height_in is not None:
       result.append("height(in):" + str(self.height_in))
 
+    if self.previous_weight is not None:
+      result.append("previous weight(lbs):" + str(self.previous_weight))
+    if self.current_weight is not None:
+      result.append("current weight(lbs):" + str(self.current_weight))
+
+
     return ','.join(result)
 
   @staticmethod
@@ -49,10 +61,65 @@ class RedditAnalyzer:
       return None
 
   @staticmethod
+  def __try_search(queries, string_to_search):
+    result = None
+    for query in queries:
+      try:
+        result = search(query, string_to_search)
+      except ValueError:
+        # This occurs if there's an apostrophe (') in the input string and it can't
+        # convert a string and int
+        pass
+      if result is not None:
+        return result
+    return None
+
+  @staticmethod
+  def __simple_height_finder_inches(string_to_search):
+    """Converts a height string to an int (to height in inches)"""
+    result = RedditAnalyzer.__try_search(["{feet:d}'{in:d}"], string_to_search)
+    if result:
+      height = result.named['feet'] * 12 + result.named['in']
+      HITS_stats['height_inches'] += 1
+      return height
+    return None
+
+  @staticmethod
+  def __simple_height_finder_cm(string_to_search):
+    # try search with and without space in between cm
+    result = RedditAnalyzer.__try_search(["{cm:d}cm", "{cm:d} cm"], string_to_search)
+    if result:
+      height = result.named['cm'] / 2.54
+      HITS_stats['height_cm'] += 1
+      return height
+    return None
+
+  @staticmethod
+  def __height_finder(string_to_search):
+    simple_result = RedditAnalyzer.__simple_height_finder_inches(string_to_search)
+    if simple_result is not None:
+      return simple_result
+
+    simple_result = RedditAnalyzer.__simple_height_finder_cm(string_to_search)
+    if simple_result is not None:
+      return simple_result
+
+    """
+    re_string = ""
+    regex = re.compile(re_string, re.IGNORECASE)
+    match = regex.search(string_to_search)
+    if match:
+      height_str = match.group(0)
+      return RedditAnalyzer.__height_string_to_int_in(height_str)
+    """
+    return None
+
+
+  @staticmethod
   def __gender_finder(string_to_search):
     """Finds the gender in a string. """
-    # explained: male | female | (new string | space | / | ( | digit) (m | f) (space | / | ) )
-    re_string = "(male|female|(\A|\s|/|\(|\d)(f|m)(\s|/|\)))"
+    # explained: male | female | (new string | space | / | ( | digit | [) (m | f) (space | / | ) ] -)
+    re_string = "(male|female|(\A|\s|/|\(|\d|\[)(f|m)(\s|/|\)|\]|-|\.))"
     regex = re.compile(re_string, re.IGNORECASE)
     match = regex.search(string_to_search)
     if match:
@@ -65,7 +132,7 @@ class RedditAnalyzer:
 
   def __check_proper_gah(self):
     # Check for the gah (gender / height / age) when formatted as: M/28/5'7"
-    re_string = "([MF]/\d+/\d+'\d+)"
+    re_string = "((m|f|male|female)/\d+/\d+'\d+)"
     regex = re.compile(re_string, re.IGNORECASE)
     # print regex.match(submission.tti)
     match = regex.search(self.title)
@@ -82,20 +149,37 @@ class RedditAnalyzer:
     return False
     # TODO: use the parse module to read the stuff from the string (ie. scanf equivalent)
 
-  def analyze_input(self):
-    global HITS_check_proper_gah
 
-    # Step 1: Find the gender
+  def __get_gender_age_height(self):
     if self.__check_proper_gah():
-      HITS_check_proper_gah += 1
+      # TODO: other methods are static except this....is that OK?
+      HITS_stats['check_proper_gah'] += 1
     else:
       # TODO: other ways to find this information
       gender = self.__gender_finder(self.title)
       if gender is not None:
         self.gender_is_female = gender
+        HITS_stats['gender_finder'] += 1
+
+      height = self.__height_finder(self.title)
+      if height is not None:
+        self.height_in = height
+        HITS_stats['height_finder'] += 1
+    return
+
+  def __get_weights(self):
+    """ Gets the current and (if applicable) previous weight"""
+    return None
+
+  def analyze_input(self):
+    # global HITS_stats
+
+    # Step 1: Find the gender
+    self.__get_gender_age_height()
 
     # Step 2: Find the
     # else, try other ways to search for weight, and height
+    self.__get_weights()
 
     # self.__check_proper_gah_parse()
 
@@ -117,7 +201,6 @@ def main():
   for submission in submissions:
     # M/28/5'7" Day 1, goal is to look as great as I feel!
     # "[MF]/\d+/\d+'\d+"
-    print "---------------------------------------------------------------------"
     print "Title: ", submission.title
     print
     # Later, we can work on the selftext
@@ -126,6 +209,7 @@ def main():
     #print nltk.pos_tag(text2)
     r = RedditAnalyzer(submission.title)
     if r.get_debug_str():
+      #pass
       print "CLASSIFICATION: ", r.get_debug_str()
 
     # print matches
@@ -137,7 +221,7 @@ def main():
     print "---------------------------------------------------------------------"
     #exit()
   print "stats:"
-  print "HITS_check_proper_gah = ", HITS_check_proper_gah
+  print HITS_stats
 
 if __name__ == "__main__":
   main()
