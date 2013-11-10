@@ -48,6 +48,8 @@ def analyze_all_progress_pics():
       submission.previous_weight_lbs = r.previous_weight
       submission.current_weight_lbs = r.current_weight
 
+      m.replace_submission(submission)
+
       print "AFTER: ", submission.to_tuple()
       classifications += 1
 

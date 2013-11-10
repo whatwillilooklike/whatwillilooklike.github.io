@@ -27,6 +27,32 @@ class Submission:
     self.permalink = submission_tuple[19]
 
   @staticmethod
+  def submission_list_to_json(submissions):
+    final_result = {}
+    result = []
+    for submission in submissions:
+      media_embed_json = None if submission.media_embed_json is None else json.loads(submission.media_embed_json)
+      media_json = None if submission.media_json is None else json.loads(submission.media_json)
+      py_obj = {
+        'id': submission.id,
+        'title': submission.title,
+        'current_weight_lbs': submission.current_weight_lbs,
+        'previous_weight_lbs': submission.previous_weight_lbs,
+        'gender': submission.gender,
+        'height_in': submission.height_in,
+        'age': submission.age,
+        'score': submission.score,
+        'adult_content': submission.adult_content,
+        'media_embed_json': media_embed_json,
+        'media_json': media_json,
+        'url': submission.url,
+        'permalink': submission.permalink
+      }
+      result.append(py_obj)
+    final_result['result'] = result
+    return json.dumps(final_result)
+
+  @staticmethod
   def from_reddit_api(r):
     # TODO: submission is not being set properly
     selftext = None if not r.selftext else r.selftext
