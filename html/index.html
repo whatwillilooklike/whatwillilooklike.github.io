@@ -10,6 +10,16 @@
   <link rel="stylesheet" href="bootstrap.min.css">
   <link rel="stylesheet" href="bootstrap-theme.min.css">
   <script src="bootstrap.min.js"></script>
+
+
+  <script src="jquery-ui-1.10.3.custom.min.js"></script>
+  <!--
+  <link rel="stylesheet" href="jquery-ui-1.10.3.custom.min.css">
+  -->
+
+  <script src="crossfilter.min.js"></script>
+
+   <link rel="stylesheet" href="my.css">
   <!--
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap-theme.min.css">
@@ -24,9 +34,49 @@
 <body>
 
 <div class="row">
-  <div class="col-md-4">.col-md-4</div>
-  <div class="col-md-4">Header</div>
-  <div class="col-md-4">.col-md-4</div>
+  <div class="col-md-4"><h2>What do they look like?</h2></div>
+  <div class="col-md-4"></div>
+  <div class="col-md-4"></div>
+</div>
+<div class="row">
+  <div class="col-md-3">
+    <div class="btn-group" data-toggle="buttons">
+    <label class="btn btn-primary">
+      <input type="radio" name="options" id="option1"> Option 1
+    </label>
+    <label class="btn btn-primary">
+      <input type="radio" name="options" id="option2"> Option 2
+    </label>
+    <label class="btn btn-primary">
+      <input type="radio" name="options" id="option3"> Option 3
+    </label>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <p>
+      <label for="height">Height range:</label>
+      <span type="text" id="height" style="border: 0; color: #f6931f; font-weight: bold;"></span>
+    </p>
+    <div id="height-slider-range"></div>
+  </div>
+  <div class="col-md-5"></div>
+</div>
+<div class="row">
+  <div class="col-md-3">
+
+  </div>
+  <div class="col-md-4">
+    <p>
+      <label for="weight">Weight range:</label>
+      <input type="text" id="weight" style="border: 0; color: #f6931f; font-weight: bold;" />
+    </p>
+    <div id="weight-slider-range"></div>
+  </div>
+  <div class="col-md-5"></div>
+</div>
+<div class="row">
+  <div class="col-md-6"><br/><br/></div>
+  <div class="col-md-6"></div>
 </div>
 <div class="row">
   <div class="col-md-4">
