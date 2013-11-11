@@ -35,7 +35,7 @@ class DatabaseManager:
     self.rows_written += 1
     print "Added a new entry."
 
-  def insert_submission(self, submission, replace_if_exists):
+  def insert_submission(self, submission):
     # Insert a row of data
     if self.row_exists(submission.id):
       # print "Submission with id =", submission.id, "already exists."
