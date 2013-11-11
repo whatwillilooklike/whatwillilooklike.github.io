@@ -9,6 +9,24 @@ var global_max_height = null;
 var global_min_weight = null;
 var global_max_weight = null;
 
+function MergeSecondArrayIntoFirst(first, second){
+  // Helper function which adds the submission entries which appear in second
+  // but not in first, into first
+  var used_ids = {};
+  for (var i = 0; i < first.length; i++){
+    var obj = first[i];
+    used_ids[obj.id] = true;
+  }
+
+  for (var i = 0; i < second.length; i++){
+    var obj = second[i];
+    if (!(obj.id in used_ids)){
+      first.push(obj);
+    }
+  }
+  return;
+}
+
 function GetSubmissionWithId(submission_id){
   // iterate through raw_data and return submission with id
   // this function is EXTREMELY ineffecient. Need to use a
@@ -153,11 +171,28 @@ function UpdateTable(){
   console.log('global max height= ' + global_max_height);
 
   // Filter by weight
-  // var submissionByHeight = submissions.dimension(function(s) {return s.adult_content;});
+  var submissionByCurrentWeight = submissions.dimension(function(s) {return s.current_weight_lbs;});
+  submissionByCurrentWeight.filter([global_min_weight, global_max_weight + 1]);
 
+  var results = submissionByCurrentWeight.top(Infinity);
+
+  submissionByCurrentWeight.filterAll(); // Need to clear that filter
+
+  var submissionByPreviousWeight = submissions.dimension(function(s) {return s.previous_weight_lbs;});
+  submissionByPreviousWeight.filter([global_min_weight, global_max_weight + 1]);
+
+  var secondary_results = submissionByPreviousWeight.top(Infinity);
+
+  MergeSecondArrayIntoFirst(results, secondary_results);
+
+  // var results = secondary_results;
   // Score dimension
-  var submissionByScore = submissions.dimension(function(s) {return s.score;});
-  var results = submissionByScore.top(Infinity);
+  // var submissionByScore = submissions.dimension(function(s) {return s.score;});
+  // var results = submissionByScore.top(Infinity);
+
+  //
+
+
   for (var i = 0; i < results.length; i++) {
     // console.log(result[i].id);
     var current = results[i];
