@@ -59,7 +59,8 @@ class RedditFetcher:
                     'heaviest', 'ago', 'diet', 'keep', 'approx', 'lifting', 'lift',
                     'pictures', 'between', 'school', 'girl', 'girls',
                     'dedication', 'confidence', 'girl friend', 'boy friend',
-                    'bulimia', 'anorexia']
+                    'bulimia', 'anorexia', 'fat', 'thin', 'skinny', 'lean',
+                    'abs', 'biceps', 'back', 'reddit']
     for search_term in search_terms:
       submissions = self.r.search(search_term, subreddit, 'new', None, 'all')
       self.__update_given_submissions(submissions)

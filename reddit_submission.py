@@ -13,6 +13,8 @@ class Submission:
     self.current_weight_lbs = submission_tuple[5]
     self.previous_weight_lbs = submission_tuple[6]
     self.height_in = submission_tuple[7]
+    # TODO: rename gender to gender_is_female and don't keep gender
+    # and adult_content as integers. Keep them as boolean internally
     self.gender = submission_tuple[8]
     self.age = submission_tuple[9]
     self.duration_days = submission_tuple[10]
@@ -38,11 +40,11 @@ class Submission:
         'title': submission.title,
         'current_weight_lbs': submission.current_weight_lbs,
         'previous_weight_lbs': submission.previous_weight_lbs,
-        'gender': submission.gender,
+        'gender': bool(submission.gender),
         'height_in': submission.height_in,
         'age': submission.age,
         'score': submission.score,
-        'adult_content': submission.adult_content,
+        'adult_content': bool(submission.adult_content),
         'media_embed_json': media_embed_json,
         'media_json': media_json,
         'url': submission.url,
