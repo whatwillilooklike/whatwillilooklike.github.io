@@ -44,7 +44,65 @@ function GetSubmissionWithId(submission_id){
 function LoadSubmission(submission_id){
   var submission = GetSubmissionWithId(submission_id);
   // alert("Loaded submission with title: " + submission.title);
-  $("#submission_content").html("Title: " + submission.title);
+  var html_content = "<b>" + submission.title + "</b><br/><br/>";
+  if (submission.url) {
+    html_content += '<a href="' + submission.url + '">' + submission.url + "</a><br/><br/>" ;
+  }
+
+  $("#submission_content").html(html_content);
+
+  if (submission.media_json){
+    // submission_image_content
+    var image_content_html = "";
+
+    if ('imgur_albums' in submission.media_json && submission.media_json.imgur_albums){
+      // TODO: only using the first album url....
+      var album_url = submission.media_json.imgur_albums[0];
+      // TODO: I think there shouldn't be a trailing slash for albums because the regex will not match a trailing
+      // slash
+      image_content_html += '<iframe class="imgur-album" width="100%" height="550" frameborder="0" src="'+album_url+'/embed"></iframe> <br/><br/>';
+
+
+    }
+
+    if ('imgur_images' in submission.media_json && submission.media_json.imgur_images) {
+
+      for (var i = 0; i < submission.media_json.imgur_images.length; i++) {
+
+        // get the large thumbnail
+        var image_url = submission.media_json.imgur_images[i];
+        image_url = image_url.substr(0, image_url.length-4);
+        image_url = image_url + "l.jpg"
+
+        image_content_html += '<img src="'+ image_url + '"> <br/><br/>';
+
+
+      }
+    }
+
+
+    $("#submission_image_content").html(image_content_html);
+
+
+  }
+
+  /*
+  if (submission.media_embed_json){
+    // html_content += "MEDIA_EMBED_JSON: " + submission.media_embed_json;
+    var decoded = $('<div/>').html(submission.media_embed_json.content).text();
+    // console.log('DECODED' + decoded);
+    html_content += "MEDIA_EMBED" + decoded;
+    // console.log('embed:' + JSON.stringify(submission.media_embed_json));
+  }
+  if (submission.media_json){
+    html_content += "MEDIA_JSON: " + JSON.toString(submission.media_json);
+    // console.log('media:' + JSON.stringify(submission.media_json));
+  }
+  */
+
+  // if submission.media
+
+
 }
 
 function InitializeHeightSlider(min_height, max_height) {
@@ -174,7 +232,7 @@ function UpdateTable(){
   var submissionByCurrentWeight = submissions.dimension(function(s) {return s.current_weight_lbs;});
   submissionByCurrentWeight.filter([global_min_weight, global_max_weight + 1]);
 
-  var results = submissionByCurrentWeight.top(Infinity);
+  var unsorted_results = submissionByCurrentWeight.top(Infinity);
 
   submissionByCurrentWeight.filterAll(); // Need to clear that filter
 
@@ -183,12 +241,17 @@ function UpdateTable(){
 
   var secondary_results = submissionByPreviousWeight.top(Infinity);
 
-  MergeSecondArrayIntoFirst(results, secondary_results);
+  MergeSecondArrayIntoFirst(unsorted_results, secondary_results);
+
+  // Create another crossfilter for this data to sort it by the score
+  var cf2 = crossfilter(unsorted_results);
+  var submissionByScore = cf2.dimension(function(s) {return s.score;});
+  var results = submissionByScore.top(Infinity);
+
 
   // var results = secondary_results;
   // Score dimension
-  // var submissionByScore = submissions.dimension(function(s) {return s.score;});
-  // var results = submissionByScore.top(Infinity);
+  //
 
   //
 
