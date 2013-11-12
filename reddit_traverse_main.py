@@ -23,20 +23,8 @@ def main():
   #count = 0
   #max_count = 50
   for submission in submissions:
-
-    if submission.self_text:
-
-      print "Title: ", submission.title
-      #print "URL: ", submission.url
-      #print "selftext: ", submission.self_text
-      # print
-      # print "imgur urls: "
-      print
-      # re_string = "\S+imgur\.com/\S+"
-      # regex =
-      Submission.load_imgur_information_for_submission(submission)
-      # print submission.media_json
-      m.replace_submission(submission)
+    Submission.load_imgur_information_for_submission(submission)
+    m.replace_submission(submission)
 
   #json_dump_str = Submission.submission_list_to_json(submissions)
   #f = open('json_dump.json', 'w')
