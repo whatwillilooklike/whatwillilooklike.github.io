@@ -48,8 +48,10 @@ class Submission:
     image_list = [x for x in regex.findall(text) if "a/" not in x]
     final_list = []
     for image in image_list:
-      if image[-4:] != ".jpg" and image[-4:] != ".png" and image[-4:] != ".gif":
-        image = image + ".jpg"
+      if image[-4:] == ".jpg" or image[-4:] == ".png" or image[-4:] == ".gif":
+        # Make sure you remove the extension
+        image = image[:-3]
+        # image = image + ".jpg"
       final_list.append(image)
     return final_list
 

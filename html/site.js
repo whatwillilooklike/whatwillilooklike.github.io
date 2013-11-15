@@ -281,6 +281,10 @@ $(document).ready(function(){
 
   $('.btn-group').button();
 
+  $('.bxslider').bxSlider({
+    pagerCustom: '#bx-pager'
+  });
+
   $("input[name=gender_radio]:radio").change(function () {
     // TODO: optimization - even if the same option is selected again, this
     // function gets called
