@@ -19,8 +19,9 @@ class RedditFetcher:
 
   def __update_given_submissions(self, submissions):
     for submission in submissions:
-      s = Submission.from_reddit_api(submission)
-      self.image_manager.insert_submission(s)
+      if not self.image_manager.row_exists(submission.id):
+        s = Submission.from_reddit_api(submission)
+        self.image_manager.insert_submission(s)
 
   def update_subreddit(self, subreddit):
     # get_hot

@@ -59,8 +59,9 @@ class Submission:
   def from_reddit_api(r):
     # TODO: submission is not being set properly
     selftext = None if not r.selftext else r.selftext
-    media = None if not r.media else json.dumps(r.media)
-    media_embed = None if not r.media_embed else json.dumps(r.media_embed)
+    # media = None if not r.media else json.dumps(r.media)
+    media_embed = None  # useless feild now
+    # media_embed = None if not r.media_embed else json.dumps(r.media_embed)
     url = None if not r.url else r.url
     author_name = "unknown" if not r.author else r.author.name
 

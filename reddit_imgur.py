@@ -5,6 +5,8 @@ import pyimgur
 import re
 
 CLIENT_ID = 'c1a3920d783f7ea'
+API_CALLS = 0
+im = pyimgur.Imgur(CLIENT_ID)
 
 class Imgur:
 
@@ -41,16 +43,30 @@ class Imgur:
 
   @staticmethod
   def get_all_images_for_album(album_url):
+    global API_CALLS
+    global im
+    print "trying to find images for album: ", album_url
     # The imgur object is primarily needed to grab the images from an imgur album
-    im = pyimgur.Imgur(CLIENT_ID)
+
+    if API_CALLS > 500:
+      print "Too many API calls to IMGUR for this hour.. Exiting."
+      exit()
+
     # Gets the album id for imgur and then runs with it
     album_id = album_url.split('/')[-1]
-    album = im.get_album(album_id)
+    # album = None
+    try:
+      API_CALLS += 1
+      album = im.get_album(album_id)
+    except:
+      print "Was not able to open the album: ", album_url
+      return []
 
     images = []
     for image in album.images:
-      print image.link
+      # print image.link
       images.append(image.link)
+      API_CALLS += 1
 
     return images
 

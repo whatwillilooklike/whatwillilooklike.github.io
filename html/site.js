@@ -2,6 +2,9 @@ var selected_id = null;
 var raw_data = null;
 
 var slider = null;
+var slider_settings = {
+    pagerCustom: '#bx-pager'
+  };
 
 var global_gender_is_female = null;
 var global_nsfw_checked = null;
@@ -99,7 +102,7 @@ function LoadSubmission(submission_id){
     $("#bx-image-slider").html(image_content_html);
     $("#bx-pager").html(image_thumbnails_html);
 
-    slider.reloadSlider();
+    slider.reloadSlider(slider_settings);
 
 
   }
@@ -299,9 +302,7 @@ $(document).ready(function(){
 
   $('.btn-group').button();
 
-  slider = $('.bxslider').bxSlider({
-    pagerCustom: '#bx-pager'
-  });
+  slider = $('.bxslider').bxSlider(slider_settings);
 
   $("input[name=gender_radio]:radio").change(function () {
     // TODO: optimization - even if the same option is selected again, this
