@@ -1,6 +1,8 @@
 var selected_id = null;
 var raw_data = null;
 
+var slider = null;
+
 var global_gender_is_female = null;
 var global_nsfw_checked = null;
 var global_sfw_checked = null;
@@ -8,6 +10,7 @@ var global_min_height = null;
 var global_max_height = null;
 var global_min_weight = null;
 var global_max_weight = null;
+
 
 function MergeSecondArrayIntoFirst(first, second){
   // Helper function which adds the submission entries which appear in second
@@ -55,6 +58,9 @@ function LoadSubmission(submission_id){
     // submission_image_content
     var image_content_html = "";
 
+    // TODO: I just need to fetch all the images from an Imgur album and use on standard
+    // image viewer
+    /*
     if ('imgur_albums' in submission.media_json && submission.media_json.imgur_albums){
       // TODO: only using the first album url....
       var album_url = submission.media_json.imgur_albums[0];
@@ -64,6 +70,9 @@ function LoadSubmission(submission_id){
 
 
     }
+    */
+
+    var image_thumbnails_html = "";
 
     if ('imgur_images' in submission.media_json && submission.media_json.imgur_images) {
 
@@ -71,17 +80,26 @@ function LoadSubmission(submission_id){
 
         // get the large thumbnail
         var image_url = submission.media_json.imgur_images[i];
-        image_url = image_url.substr(0, image_url.length-4);
-        image_url = image_url + "l.jpg"
+        // image_url = image_url.substr(0, image_url.length-4);
+        var image_url_large = image_url + "l.jpg"
+        var image_url_small = image_url + "s.jpg"
+        // <li><img src="http://i.imgur.com/J7NnmFB.jpg" /></li>
+        console.log("large image: " + image_url_large);
 
-        image_content_html += '<img src="'+ image_url + '"> <br/><br/>';
-
+        // image_content_html += '<img src="'+ image_url + '"> <br/><br/>';
+        image_content_html += '<li><img src="' + image_url_large + '" /></li>';
+        // <a data-slide-index="0" href=""><img src="http://i.imgur.com/J7NnmFBs.jpg" /></a>
+        image_thumbnails_html += '<a data-slide-index="' + i.toString() + '" href=""><img src="' + image_url_small + '" /></a>';
 
       }
+      console.log("Image content html: " + image_content_html);
     }
 
 
-    $("#submission_image_content").html(image_content_html);
+    $("#bx-image-slider").html(image_content_html);
+    $("#bx-pager").html(image_thumbnails_html);
+
+    slider.reloadSlider();
 
 
   }
@@ -281,7 +299,7 @@ $(document).ready(function(){
 
   $('.btn-group').button();
 
-  $('.bxslider').bxSlider({
+  slider = $('.bxslider').bxSlider({
     pagerCustom: '#bx-pager'
   });
 

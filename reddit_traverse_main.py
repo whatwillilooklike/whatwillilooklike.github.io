@@ -1,11 +1,11 @@
 """Use this for simple scripts which require DB queries."""
 
 __author__ = 'kyedidi'
-import json
-import re
+
 
 from reddit_database_manager import DatabaseManager
 from reddit_submission import Submission
+from reddit_imgur import Imgur
 
 DATABASE_PATH = "reddit_submissions.sqlite"
 
@@ -23,7 +23,7 @@ def main():
   #count = 0
   #max_count = 50
   for submission in submissions:
-    Submission.load_imgur_information_for_submission(submission)
+    Imgur.load_imgur_information_for_submission(submission)
     m.replace_submission(submission)
 
   #json_dump_str = Submission.submission_list_to_json(submissions)
