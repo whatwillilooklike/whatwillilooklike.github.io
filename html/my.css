@@ -10,3 +10,13 @@
  overflow-y: scroll;
  overflow-x: hidden;
  }
+
+ body {
+   margin-left:1em;
+   margin-top:1em;
+ }
+
+.no-padding-or-margin{
+    padding: 0px;
+    margin: 0px;
+}
