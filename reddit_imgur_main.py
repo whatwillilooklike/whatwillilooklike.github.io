@@ -1,4 +1,4 @@
-"""Use this for simple scripts which require DB queries."""
+"""Get Imgur info for each image."""
 
 __author__ = 'kyedidi'
 
@@ -17,18 +17,17 @@ def main():
           'manually_verified = 0 and gender IS NOT NULL and age IS NOT NULL and ' \
           'height_in IS NOT NULL and current_weight_lbs IS NOT NULL;'
   """
-  #query = 'SELECT * FROM submissions WHERE media_json IS NULL;'
-  query = 'SELECT * FROM submissions;'
+  query = 'SELECT * FROM submissions WHERE media_json IS NULL;'
+  # query = 'SELECT * FROM submissions;'
   m = DatabaseManager(DATABASE_PATH)
   submissions = [Submission(x) for x in m.query(query)]
   #count = 0
   #max_count = 50
   for submission in submissions:
-    submission.media_json = None
-    submission.media_embed_json = None
-    #Imgur.load_imgur_information_for_submission(submission)
-    m.replace_submission(submission)
-    # print submission.title
+    #submission.media_json = None
+    #submission.media_embed_json = None
+    Imgur.load_imgur_information_for_submission(submission)
+    # m.replace_submission(submission)
 
   #json_dump_str = Submission.submission_list_to_json(submissions)
   #f = open('json_dump.json', 'w')

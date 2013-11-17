@@ -3,6 +3,7 @@ __author__ = 'kyedidi'
 import json
 import pyimgur
 import re
+from urlparse import urlparse
 
 CLIENT_ID = 'c1a3920d783f7ea'
 API_CALLS = 0
@@ -31,7 +32,7 @@ class Imgur:
       return []
     re_string = "[/:\.a-zA-z]*imgur\.com/[/:\.\w]+"  # TODO: need to exclude the /a/ (albums)
     regex = re.compile(re_string, re.IGNORECASE)
-    image_list = [x for x in regex.findall(text) if "a/" not in x]
+    image_list = [x for x in regex.findall(text) if "/a/" not in x]
     final_list = []
     for image in image_list:
       if image[-4:] == ".jpg" or image[-4:] == ".png" or image[-4:] == ".gif":
@@ -42,19 +43,29 @@ class Imgur:
     return final_list
 
   @staticmethod
+  def get_image_page_for_url(url):
+    if url[-4:] == ".jpg" or url[-4:] == ".png" or url[-4:] == ".gif":
+      # Make sure you remove the extension
+      url = url[:-4]
+
+    return url
+
+  @staticmethod
   def get_all_images_for_album(album_url):
     global API_CALLS
     global im
     print "trying to find images for album: ", album_url
+    # return []
     # The imgur object is primarily needed to grab the images from an imgur album
 
     if API_CALLS > 500:
       print "Too many API calls to IMGUR for this hour.. Exiting."
+      #return []
       exit()
 
     # Gets the album id for imgur and then runs with it
     album_id = album_url.split('/')[-1]
-    # album = None
+    album = None
     try:
       API_CALLS += 1
       album = im.get_album(album_id)
@@ -65,15 +76,77 @@ class Imgur:
     images = []
     for image in album.images:
       # print image.link
-      images.append(image.link)
+      images.append(Imgur.get_image_page_for_url(image.link))
       API_CALLS += 1
 
     return images
 
   @staticmethod
+  def get_url_for_url_object(u):
+    """Returns a url for a url object without the trailing slash"""
+    path = u.path if u.path[-1] != '/' else u.path[:-1]
+    if len(path) < 5 or len(path) > 14:
+      print "ERROR: wrong path for url: ", u, path
+      exit()
+    return u.scheme + '://' + u.netloc + path
+
+  @staticmethod
+  def get_urls_for_possible_urls(possible_urls):
+    imgur_urls = []
+    imgur_album_urls = []
+    for possible_url in possible_urls:
+      u = urlparse(possible_url, scheme='http', allow_fragments=True)
+      url_path = Imgur.get_url_for_url_object(u)
+      if "/a/" in u.path:
+        imgur_album_urls.append(url_path)
+      else:
+        # This is an imgur
+        url_path = Imgur.get_image_page_for_url(url_path)
+
+        imgur_urls.append(url_path)
+        # TODO: make sure that it's a valid imgur image
+
+
+      # http://imgur.com/a/RMoR1#0
+    return imgur_urls, imgur_album_urls
+
+  @staticmethod
+  def get_imgur_urls(text):
+    if not text:
+      return []
+    re_string = "[/:\.\w]*imgur\.com/[/\.\w]+"
+    regex = re.compile(re_string, re.IGNORECASE)
+    matches = regex.findall(text)
+    results = []
+    for match in matches:
+      if match.count(':') > 1:
+        # example: here's the after:http://i.imgur.com/MMcxAnf.jpg?2
+        # when there's no space after the colon
+        match = match.split(':', 1)[1]
+      results.append(match)
+    return results
+    # return [x for x in re.split('\s|,', text) if "imgur.com" in x]
+
+  @staticmethod
   def load_imgur_information_for_submission(submission):
     # call the above two functions and if there's a response, put it into a json object
+
+    print "Title: ", submission.title
+    print "Selftext: ", submission.self_text
+    print "URL: ", submission.url
+    possible_imgur_urls = Imgur.get_imgur_urls(submission.self_text) + Imgur.get_imgur_urls(submission.url)
+    # imgur_images = Imgur.get_images_for_possible_urls(possible_imgur_urls)
+    imgur_image_urls, imgur_album_urls = Imgur.get_urls_for_possible_urls(possible_imgur_urls)
+
+    imgur_album_image_urls = []
+    for imgur_album_url in imgur_album_urls:
+       imgur_album_image_urls += Imgur.get_all_images_for_album(imgur_album_url)
+
+    imgur_images = imgur_image_urls + imgur_album_image_urls
+
+    """
     imgur_images_set = set()
+
 
     imgur_albums_set = set()
     imgur_albums_in_self_text = Imgur.__get_imgur_albums(submission.self_text)
@@ -100,6 +173,8 @@ class Imgur:
 
     imgur_images = list(imgur_images_set)
 
+    """
+
     json_obj = {}
     #if imgur_albums:
     #  json_obj['imgur_albums'] = imgur_albums
@@ -111,5 +186,11 @@ class Imgur:
       return
 
     json_str = json.dumps(json_obj)
-    submission.media_json = json_str
+
+    print "Image URLs: ", imgur_image_urls
+    print "Image album URLs: ", imgur_album_urls
+    print "Image links saved: ", imgur_images
+    # print json_str
+    print "--------------------------------------------------------------------------------"
+    # submission.media_json = json_str
     return

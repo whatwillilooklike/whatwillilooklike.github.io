@@ -15,7 +15,10 @@ to update the reddit_submissions.sqlite with the computed features (height, weig
 They are called "computed features" because they are computed based off the title and
 text of the reddit post
 
-Step #3
+Step #3:
+Run reddit_imgur_main.py
+
+Step #4
 Run reddit_dump_json_main.py
 
 to dump the files into a .json file

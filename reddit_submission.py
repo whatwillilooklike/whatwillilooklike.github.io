@@ -1,5 +1,4 @@
 import json
-from reddit_imgur import Imgur
 
 __author__ = 'kyedidi'
 
@@ -72,7 +71,8 @@ class Submission:
                         author_name, r.created, r.subreddit.display_name,
                         url, r.permalink)
     s = Submission(submission_tuple)
-    Imgur.load_imgur_information_for_submission(s)
+    # Moved the code below to reddit_imgur_main.py
+    # Imgur.load_imgur_information_for_submission(s)
     # print s
     return s
 
