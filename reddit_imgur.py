@@ -131,9 +131,7 @@ class Imgur:
   def load_imgur_information_for_submission(submission):
     # call the above two functions and if there's a response, put it into a json object
 
-    print "Title: ", submission.title
-    print "Selftext: ", submission.self_text
-    print "URL: ", submission.url
+
     possible_imgur_urls = Imgur.get_imgur_urls(submission.self_text) + Imgur.get_imgur_urls(submission.url)
     # imgur_images = Imgur.get_images_for_possible_urls(possible_imgur_urls)
     imgur_image_urls, imgur_album_urls = Imgur.get_urls_for_possible_urls(possible_imgur_urls)
@@ -141,6 +139,11 @@ class Imgur:
     imgur_album_image_urls = []
     for imgur_album_url in imgur_album_urls:
        imgur_album_image_urls += Imgur.get_all_images_for_album(imgur_album_url)
+
+    if imgur_album_urls and not imgur_album_image_urls:
+      print "Imgur API is down. TODO: make this return later."
+      exit()
+      return
 
     imgur_images = imgur_image_urls + imgur_album_image_urls
 
@@ -187,10 +190,6 @@ class Imgur:
 
     json_str = json.dumps(json_obj)
 
-    print "Image URLs: ", imgur_image_urls
-    print "Image album URLs: ", imgur_album_urls
-    print "Image links saved: ", imgur_images
-    # print json_str
-    print "--------------------------------------------------------------------------------"
-    # submission.media_json = json_str
+
+    submission.media_json = json_str
     return

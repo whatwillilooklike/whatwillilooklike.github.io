@@ -92,17 +92,34 @@ function LoadSubmission(submission_id){
         // image_content_html += '<img src="'+ image_url + '"> <br/><br/>';
         image_content_html += '<li><img src="' + image_url_large + '" /></li>';
         // <a data-slide-index="0" href=""><img src="http://i.imgur.com/J7NnmFBs.jpg" /></a>
-        image_thumbnails_html += '<a data-slide-index="' + i.toString() + '" href=""><img src="' + image_url_small + '" /></a>';
+        image_thumbnails_html += '<a data-slide-index="' + i.toString() + '" href=""><img src="' + image_url_small + '" /></a>&nbsp;';
 
       }
       console.log("Image content html: " + image_content_html);
     }
 
+    /*
+    if (!($("#bx-image-slider").length)) {
+      console.log('#bx-image-slider exists');
+      $("#bx-image").append( $( "h2" ) );
+    }
+    if (!($("#bx-pager").length)) {
+      console.log('#bx-pager exists');
+    }
+    */
+
+    $("#bx-image-slider-container").html('<ul id="bx-image-slider" class="bxslider"></ul>');
+    $("#bx-pager-container").html('<div id="bx-pager"></div>');
+
+    // bx-image-slider-container
 
     $("#bx-image-slider").html(image_content_html);
+    // console.log("#bx-image-slider value: " + $("#bx-image-slider").val());
     $("#bx-pager").html(image_thumbnails_html);
+    // console.log("#bx-pager value: " + $("#bx-pager").val());
 
-    slider.reloadSlider(slider_settings);
+    // slider.reloadSlider(slider_settings);
+    slider = $('.bxslider').bxSlider(slider_settings);
 
 
   }
@@ -302,7 +319,7 @@ $(document).ready(function(){
 
   $('.btn-group').button();
 
-  slider = $('.bxslider').bxSlider(slider_settings);
+  // slider = $('.bxslider').bxSlider(slider_settings);
 
   $("input[name=gender_radio]:radio").change(function () {
     // TODO: optimization - even if the same option is selected again, this

@@ -27,7 +27,15 @@ def main():
     #submission.media_json = None
     #submission.media_embed_json = None
     Imgur.load_imgur_information_for_submission(submission)
-    # m.replace_submission(submission)
+
+    print "Title: ", submission.title
+    print "Selftext: ", submission.self_text
+    print "URL: ", submission.url
+    print "Media JSON: ", submission.media_json
+    # print json_str
+    print "--------------------------------------------------------------------------------"
+
+    m.replace_submission(submission)
 
   #json_dump_str = Submission.submission_list_to_json(submissions)
   #f = open('json_dump.json', 'w')
