@@ -6,7 +6,7 @@ import re
 from urlparse import urlparse
 
 CLIENT_ID = 'c1a3920d783f7ea'
-API_CALLS = 0
+# API_CALLS = 0
 im = pyimgur.Imgur(CLIENT_ID)
 
 class Imgur:
@@ -57,12 +57,12 @@ class Imgur:
     print "trying to find images for album: ", album_url
     # return []
     # The imgur object is primarily needed to grab the images from an imgur album
-
+    """
     if API_CALLS > 500:
       print "Too many API calls to IMGUR for this hour.. Exiting."
       #return []
       exit()
-
+    """
     # Gets the album id for imgur and then runs with it
     album_id = album_url.split('/')[-1]
     album = None
@@ -70,10 +70,14 @@ class Imgur:
       API_CALLS += 1
       album = im.get_album(album_id)
     except:
-      print "Was not able to open the album: ", album_url
-      return []
+      print "***** Was not able to open the album: ", album_url
+      return None
+      # return []
 
     images = []
+    if len(album.images) == 0:
+      print "The album is empty."
+      return []
     for image in album.images:
       # print image.link
       images.append(Imgur.get_image_page_for_url(image.link))
@@ -138,14 +142,19 @@ class Imgur:
 
     imgur_album_image_urls = []
     for imgur_album_url in imgur_album_urls:
-       imgur_album_image_urls += Imgur.get_all_images_for_album(imgur_album_url)
+       temp_images_for_album = Imgur.get_all_images_for_album(imgur_album_url)
+       if temp_images_for_album == None:  # as opposed to empty list
+         print "Imgur API is not responding to album requests...... Exiting. "
+         print "Was looking up submission: ", submission.to_tuple()
+         # I'll just return here, so it can still run
+         return
+         # exit()
+       imgur_album_image_urls += temp_images_for_album
 
-    if imgur_album_urls and not imgur_album_image_urls:
-      print "Imgur API is down. TODO: make this return later."
-      exit()
-      return
 
-    imgur_images = imgur_image_urls + imgur_album_image_urls
+
+    # Images need to be unique
+    imgur_images = list(set(imgur_image_urls + imgur_album_image_urls))
 
     """
     imgur_images_set = set()

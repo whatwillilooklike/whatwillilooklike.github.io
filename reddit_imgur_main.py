@@ -6,7 +6,7 @@ __author__ = 'kyedidi'
 from reddit_database_manager import DatabaseManager
 from reddit_submission import Submission
 from reddit_imgur import Imgur
-
+import time
 DATABASE_PATH = "reddit_submissions.sqlite"
 
 
@@ -42,4 +42,12 @@ def main():
   #f.write(json_dump_str)
 
 if __name__ == "__main__":
-  main()
+  while True:
+    try:
+      print "Sleeping now"
+      main()
+    except:
+      print "Error'd"
+    sleep_for = 2100
+    print "sleeping for: ", sleep_for, "seconds."
+    time.sleep(sleep_for)

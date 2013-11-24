@@ -50,10 +50,13 @@ function GetSubmissionWithId(submission_id){
 function LoadSubmission(submission_id){
   var submission = GetSubmissionWithId(submission_id);
   // alert("Loaded submission with title: " + submission.title);
-  var html_content = "<b>" + submission.title + "</b><br/><br/>";
+  var html_content = "<b>" + submission.title + "</b> <sup><a href='"+ submission.permalink +"' target='_blank'>[LINK]</a></sup><br/><br/>";
+
+  /*
   if (submission.url) {
     html_content += '<a href="' + submission.url + '">' + submission.url + "</a><br/><br/>" ;
   }
+  */
 
   $("#submission_content").html(html_content);
 

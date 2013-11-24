@@ -15,8 +15,9 @@ HITS_stats = {'check_proper_gah': 0, 'gender_finder': 0,
               'height_cm': 0, 'weight_identification': 0}
 
 class RedditAnalyzer:
-  def __init__(self, title):
+  def __init__(self, title, self_text):
     self.title = title  # title of the post
+    self.self_text = self_text
 
     self.height_in = None
     self.age = None
@@ -25,8 +26,26 @@ class RedditAnalyzer:
     self.previous_weight = None
     self.current_weight = None
 
+    # lc_ = low confidence
+    self.lc_height_in = None
+    self.lc_age = None
+    self.lc_gender_is_female = None
+    self.lc_previous_weight = None
+    self.lc_current_weight = None
+
+    self.potential_weights = []
+
     self.analyze_input()
     # self.is_complete = check_if_complete()
+
+  def has_height(self):
+    return self.height_in is not None or self.lc_height_in is not None
+
+  def has_gender(self):
+    return self.gender_is_female is not None or self.lc_gender_is_female is not None
+
+  def has_current_weight(self):
+    return self.current_weight is not None or self.lc_current_weight is not None
 
   def everything_complete_including_previous_weight(self):
     return (self.height_in is not None and
@@ -34,6 +53,23 @@ class RedditAnalyzer:
             self.gender_is_female is not None and
             self.previous_weight is not None and
             self.current_weight is not None)
+
+  def get_lc_debug_str(self):
+    result = []
+    if self.lc_gender_is_female is not None:
+      gender_str = "gender: "
+      gender_str += "F" if self.lc_gender_is_female else "M"
+      result.append(gender_str)
+    if self.lc_age is not None:
+      result.append("age: " + str(self.lc_age))
+    if self.lc_height_in is not None:
+      result.append("height(in):" + str(self.lc_height_in))
+
+    if self.lc_previous_weight is not None:
+      result.append("previous weight(lbs):" + str(self.lc_previous_weight))
+    if self.lc_current_weight is not None:
+      result.append("current weight(lbs):" + str(self.lc_current_weight))
+    return ', '.join(result)
 
   def get_debug_str(self):
     result = []
@@ -50,7 +86,6 @@ class RedditAnalyzer:
       result.append("previous weight(lbs):" + str(self.previous_weight))
     if self.current_weight is not None:
       result.append("current weight(lbs):" + str(self.current_weight))
-
 
     return ', '.join(result)
 
@@ -138,6 +173,75 @@ class RedditAnalyzer:
     return None
 
   @staticmethod
+  def __process_arbitrary_element_list(l):
+    result = {}
+    for e in l:
+
+       # if elem in height
+      # if elem is weight
+      weight = RedditAnalyzer.__get_weight_from_str(e)
+      if weight:
+        result["weight"] = weight
+        continue
+
+      # if elem is age
+      gender_is_female = RedditAnalyzer.__gender_finder(e)
+      if gender_is_female:
+        result["gender_is_female"] = gender_is_female
+        continue
+
+    return result
+
+  def get_potential_weights(self, string_to_search):
+    if not string_to_search:
+      return
+    re_string = """(\d+)\s*(lb|pounds)"""
+    regex = re.compile(re_string)
+    matches = regex.findall(string_to_search, re.IGNORECASE)
+    for match in matches:
+      # check match[0] and match[1]
+      self.potential_weights.append(int(match[0]))
+
+    if self.potential_weights:
+      # remove duplicates
+      self.potential_weights = sorted(list(set(self.potential_weights)))
+
+    return
+
+
+
+  def search_slash_delimited(self, string_to_search):
+    # Four elements
+    re_string = """([\w'"]*)/([\s\w'"]*)/([\s\w'"]*)/([\w'"]*)"""
+    regex = re.compile(re_string)
+    matches = regex.findall(string_to_search, re.IGNORECASE)
+
+    if not matches:
+      # Three elements
+      re_string = """([\w'"]*)/([\s\w'"]*)/([\w'"]*)"""
+      regex = re.compile(re_string)
+      matches = regex.findall(string_to_search, re.IGNORECASE)
+
+    if not matches:
+      re_string = """([\w'"]*)/([\w'"]*)"""
+      regex = re.compile(re_string)
+      matches = regex.findall(string_to_search, re.IGNORECASE)
+
+    if matches:
+      result = RedditAnalyzer.__process_arbitrary_element_list(matches)
+
+      if "height_in" in result:
+        self.lc_height_in = result["height_in"]
+      if "age" in result:
+        self.lc_age = result["age"]
+      if "gender_is_female" in result:
+        self.lc_gender_is_female = result["gender_is_female"]
+      if "current_weight" in result:
+        self.lc_current_weight = result["current_weight"]
+
+    return
+
+  @staticmethod
   def __check_proper_gah(string_to_search):
     # Check for the gah (gender / height / age) when formatted as: M/28/5'7"
     re_string = "((m|f|male|female)/\d+/\d+'\d+)"
@@ -171,6 +275,10 @@ class RedditAnalyzer:
       if gender is not None:
         self.gender_is_female = gender
 
+      if self.self_text:
+        self.lc_gender_is_female = self.__gender_finder(self.self_text)
+        self.lc_height_in = self.__height_finder(self.self_text)
+
       height = self.__height_finder(self.title)
       if height is not None:
         self.height_in = height
@@ -185,6 +293,23 @@ class RedditAnalyzer:
       return False
     return True
 
+  @staticmethod
+  def __get_weight_from_str(str):
+    # TODO: handle the arrows and shit. Currently only handles one value
+    # get number(s) from string
+    # english_weight = ["pounds", "lbs"]
+    re_string = "(\d+)\s*(lbs|pounds)*"
+    regex = re.compile(re_string)
+    matches = regex.findall(str, re.IGNORECASE)
+
+    values_found = []
+    if matches:
+      for match in matches:
+        values_found.append(match[0])  # has to be a number
+
+    print values_found
+
+    return
 
   @staticmethod
   def __simple_greater_than_or_hyphen_search(string_to_search):
@@ -219,6 +344,11 @@ class RedditAnalyzer:
       self.previous_weight = weight_rvalue['previous_weight']
       self.current_weight = weight_rvalue['current_weight']
     # time.sleep(4)
+
+    # New way to extract all weights
+    self.get_potential_weights(self.self_text)
+    self.get_potential_weights(self.title)
+
     return None
 
   def analyze_input(self):
@@ -232,6 +362,8 @@ class RedditAnalyzer:
 
     # Step 2: Find the weights (current and previous if applicable)
     self.__get_weights()
+
+
 
     # Step 3:
     # self.__check_proper_gah_parse()
