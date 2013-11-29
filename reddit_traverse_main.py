@@ -17,7 +17,7 @@ def main():
           'manually_verified = 0 and gender IS NOT NULL and age IS NOT NULL and ' \
           'height_in IS NOT NULL and current_weight_lbs IS NOT NULL;'
   """
-  query = 'SELECT * FROM submissions WHERE media_json IS NULL;'
+  query = 'SELECT * FROM submissions WHERE manually_marked = 0 and manually_verified = 0 and media_json NOT NULL;'
   # query = 'SELECT * FROM submissions;'
   m = DatabaseManager(DATABASE_PATH)
   submissions = [Submission(x) for x in m.query(query)]
@@ -27,8 +27,13 @@ def main():
     # submission.media_json = None
     # submission.media_embed_json = None
     #Imgur.load_imgur_information_for_submission(submission)
+    submission.gender = None
+    submission.age = None
+    submission.current_weight_lbs = None
+    submission.previous_weight_lbs = None
+    submission.height_in = None
     m.replace_submission(submission)
-    print submission.title
+    # print submission.title
 
   #json_dump_str = Submission.submission_list_to_json(submissions)
   #f = open('json_dump.json', 'w')

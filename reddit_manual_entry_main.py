@@ -13,9 +13,15 @@ import time
 DATABASE_PATH = "reddit_submissions.sqlite"
 
 def verify_submission_meets_criteria(submission):
+  print submission.current_weight_lbs
+  print submission.previous_weight_lbs
+  print submission.height_in
+  print submission.gender
   return (submission.current_weight_lbs is not None and
           submission.height_in is not None and
-          submission.gender is not None)
+          submission.gender is not None and
+          submission.manually_marked == 1,
+          submission.manually_verified == 1)
 
 def main():
   time_taken = 0
@@ -34,14 +40,18 @@ def main():
   total = 0
   weight_and_height = 0
   atleast_height = 0
+  previous_stats = ""
+  global_start_time = time.time()
+  entries_processed = 0
 
   for submission in submissions:
     #submission.media_json = None
     #submission.media_embed_json = None
     r = RedditAnalyzer(submission.title, submission.self_text)
 
-    entries_processed = 0
-    global_start_time = time.time()
+
+
+
 
     if r.has_gender() and r.has_height() and not r.has_current_weight():
       local_start_time = time.time()
@@ -51,13 +61,15 @@ def main():
 
 
       print "ID: ", submission.id
-      print "Title: ", submission.title
+      print "Title: ", t.bold(submission.title)
       print "Self text: ", submission.self_text
 
       print t.bold(t.red("CLASSIFICATION: " + r.get_debug_str()))
       print t.bold(t.red("LOW CONFIDENCE CLASSIFICATION: " + r.get_lc_debug_str()))
-      print t.bold(t.green("Potential weights:" + ','.join(str(x) for x in r.potential_weights)))
+      # print t.bold(t.green("Potential weights:" + ','.join(str(x) for x in r.potential_weights)))
 
+
+      print t.bold(t.green(previous_stats))
 
       print "NOTE: If current weight is skipped, nothing will be saved."
       previous_weight = raw_input('Enter previous weight: ')
@@ -72,12 +84,13 @@ def main():
 
       if current_weight:
         submission.current_weight_lbs = int(current_weight)
-        submission.previous_weight_lbs = int(previous_weight)
+        if previous_weight:
+          submission.previous_weight_lbs = int(previous_weight)
 
         # We know that one of the low confidence or regual is set,
         # so we know the below two if statements will be successful
         # in setting the values
-        if not r.gender_is_female:
+        if r.gender_is_female is None:
           r.gender_is_female = r.lc_gender_is_female
 
         if not r.height_in:
@@ -90,26 +103,25 @@ def main():
         if r.age:
           submission.age = r.age
         # submission.manually_verified
-        print submission.to_tuple()
+        submission.manually_marked = 1
+        submission.manually_verified = 1
+
+
+
         assert(verify_submission_meets_criteria(submission))
 
         m.replace_submission(submission)
-        print "Successfully entered."
         # entries_processed
         local_end_time = time.time()
-        print "Entry took ", local_end_time - local_start_time, "seconds."
-        print "Rate:", (3600 / (local_end_time - local_start_time)), "entries / hr."
+        previous_stats = "\n"
+        previous_stats += "Entry took " + str(round((local_end_time - local_start_time), 2)) + " seconds.\n"
+        previous_stats += "Rate: " + str(round((3600 / (local_end_time - local_start_time)), 2)) + " entries / hr.\n"
         entries_per_second_so_far = entries_processed / (local_end_time - global_start_time)
-        print "Ongoing Rate:", entries_per_second_so_far * 3600, "entries / hr."
+        previous_stats += "Ongoing Rate: " + str(round(entries_per_second_so_far * 3600, 2)) + " entries / hr."
+        print previous_stats
 
 
       print
-      # Later, we can work on the selftext
-      #text = nltk.word_tokenize("And now for something completely different")
-      #text2 = nltk.word_tokenize(submission.title)
-      #print nltk.pos_tag(text2)
-
-
       print "---------------------------------------------------------------------"
 
 

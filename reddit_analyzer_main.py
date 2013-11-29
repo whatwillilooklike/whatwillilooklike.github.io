@@ -77,7 +77,7 @@ def analyze_all_progress_pics():
 
       print t.bold(t.red("CLASSIFICATION: " + r.get_debug_str()))
       print t.bold(t.red("LOW CONFIDENCE CLASSIFICATION: " + r.get_lc_debug_str()))
-      print t.bold(t.green("Potential weights:" + ','.join(r.potential_weights)))
+      print t.bold(t.green("Potential weights:" + ','.join(str(x) for x in r.potential_weights)))
 
     # End Print statements
 

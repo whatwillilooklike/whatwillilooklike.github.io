@@ -1,0 +1,20 @@
+This documents the list of improvements we can make to the auto detection.
+
+------------
+
+Only previous weight?
+id's: 1c4lm4, 1hjfzy
+------------
+
+Search for this in the body:
+id:1fmnfw
+body text:
+(short Mexican)/SW: 220 CW: 140 GW 130
+
+------------
+
+Have a testing infrastructure where you can enter the id
+you want to test against and get the classification.
+
+------------
+
