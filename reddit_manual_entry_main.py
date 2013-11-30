@@ -72,7 +72,17 @@ def main():
       print t.bold(t.green(previous_stats))
 
       print "NOTE: If current weight is skipped, nothing will be saved."
+
       previous_weight = raw_input('Enter previous weight: ')
+
+      if previous_weight == "XXX":
+        # This means this is a bad entry and does not have the
+        # adequate weight data
+        submission.manually_marked = 1
+        submission.manually_verified = 1
+        m.replace_submission(submission)
+        continue
+
       current_weight = raw_input('Enter current weight: ')
 
       if previous_weight:

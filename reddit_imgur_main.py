@@ -26,7 +26,10 @@ def main():
   for submission in submissions:
     #submission.media_json = None
     #submission.media_embed_json = None
-    Imgur.load_imgur_information_for_submission(submission)
+    try:
+      Imgur.load_imgur_information_for_submission(submission)
+    except:
+      continue
 
     print "Title: ", submission.title
     print "Selftext: ", submission.self_text
@@ -43,11 +46,7 @@ def main():
 
 if __name__ == "__main__":
   while True:
-    try:
-      print "Sleeping now"
-      main()
-    except:
-      print "Error'd"
+    main()
     sleep_for = 2100
     print "sleeping for: ", sleep_for, "seconds."
     time.sleep(sleep_for)

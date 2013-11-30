@@ -39,20 +39,40 @@ def analyze_all_progress_pics():
     # print "BEFORE: ", submission.to_tuple()
 
     # the if statement below is what makes it primary work for progress pics
-    if r.everything_complete_including_previous_weight() and r.get_debug_str():
+    if r.has_gender() and r.has_height() and r.has_current_weight():
       #pass
       #print "CLASSIFICATION: ", r.get_debug_str()
       #print "BEFORE: ", submission.to_tuple()
 
-      submission.gender = r.gender_is_female
-      submission.age = r.age
-      submission.height_in = r.height_in
+      # Either the value or the lc_value (low confidence)
+      # value will be set. We want to set the submission with
+      # one of those, preferably the non-lc version
 
-      submission.previous_weight_lbs = r.previous_weight
-      submission.current_weight_lbs = r.current_weight
+      # Gender
+      if r.gender_is_female is not None:
+        submission.gender = r.gender_is_female
+      else:
+        submission.gender = r.lc_gender_is_female
+
+      # Height
+      if r.height_in is not None:
+        submission.height_in = r.height_in
+      else:
+        submission.height_in = r.lc_height_in
+
+      # Current Weight
+      if r.current_weight is not None:
+        submission.current_weight_lbs = r.current_weight
+      else:
+        submission.current_weight_lbs = r.lc_current_weight
+
+      # Previous Weight
+      if r.previous_weight is not None:
+        submission.previous_weight_lbs = r.previous_weight
+      else:
+        submission.previous_weight_lbs = r.lc_previous_weight
 
       m.replace_submission(submission)
-
       # print "AFTER: ", submission.to_tuple()
       classifications += 1
 

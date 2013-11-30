@@ -12,7 +12,8 @@ from parse import parse,search
 
 HITS_stats = {'check_proper_gah': 0, 'gender_finder': 0,
               'height_finder': 0, 'height_inches': 0,
-              'height_cm': 0, 'weight_identification': 0}
+              'height_cm': 0, 'weight_identification': 0,
+              'sw_cw_identification': 0}
 
 class RedditAnalyzer:
   def __init__(self, title, self_text):
@@ -47,12 +48,15 @@ class RedditAnalyzer:
   def has_current_weight(self):
     return self.current_weight is not None or self.lc_current_weight is not None
 
+  """
   def everything_complete_including_previous_weight(self):
     return (self.height_in is not None and
             self.age is not None and
             self.gender_is_female is not None and
             self.previous_weight is not None and
             self.current_weight is not None)
+
+  """
 
   def get_lc_debug_str(self):
     result = []
@@ -114,15 +118,40 @@ class RedditAnalyzer:
     return None
 
   @staticmethod
+  def __is_reasonable_height(height_in):
+    if height_in < 36 or height_in > 100:
+      return False
+    else:
+      return True
+
+  @staticmethod
   def __simple_height_finder_inches(string_to_search):
     """Converts a height string to an int (to height in inches)"""
-    result = RedditAnalyzer.__try_search(["{feet:d}'{in:d}"], string_to_search)
-    if result:
-      height = result.named['feet'] * 12 + result.named['in']
+    re_string = "(\d)'(\d*)"
+    regex = re.compile(re_string)
+    matches = regex.findall(string_to_search, re.IGNORECASE)
+    if not matches or len(matches) > 1:
+      return None
+    match = matches[0]
+
+    #print string_to_search
+    #print match
+    assert(len(match) == 2)
+    feet = int(match[0])
+    inches = 0
+    if match[1] != "":
+      inches = int(match[1])
+
+    height = feet * 12 + inches
+
+    if RedditAnalyzer.__is_reasonable_height(height):
       HITS_stats['height_inches'] += 1
       return height
-    return None
+    else:
+      return None
 
+  # TODO: make cm function more like inches
+  """
   @staticmethod
   def __simple_height_finder_cm(string_to_search):
     # try search with and without space in between cm
@@ -132,6 +161,7 @@ class RedditAnalyzer:
       HITS_stats['height_cm'] += 1
       return height
     return None
+  """
 
   @staticmethod
   def __height_finder(string_to_search):
@@ -140,10 +170,14 @@ class RedditAnalyzer:
       HITS_stats['height_finder'] += 1
       return simple_result
 
+    # Temporarily disabling cm because of bugs
+
+    """
     simple_result = RedditAnalyzer.__simple_height_finder_cm(string_to_search)
     if simple_result is not None:
       HITS_stats['height_finder'] += 1
       return simple_result
+    """
 
     """
     re_string = ""
@@ -336,6 +370,36 @@ class RedditAnalyzer:
 
     return None
 
+  @staticmethod
+  def __find_number_after_prefix(prefix, text):
+    """Finds number after text, eg. SW: 145"""
+    re_string = prefix + "[\s:-]*(\d+)"
+    regex = re.compile(re_string)
+    matches = regex.findall(text, re.IGNORECASE)
+    # print matches
+    if not matches:
+      return None
+    if len(matches) > 1:
+      # TODO: deal with this case
+      return None
+
+    match = matches[0]
+
+    return match
+
+  @staticmethod
+  def __get_sw_and_cw(text):
+    """ Searches text for SW and CW and returns the numbers
+    after
+    """
+
+    if not text:
+      return None, None
+
+    sw = RedditAnalyzer.__find_number_after_prefix("SW", text)
+    cw = RedditAnalyzer.__find_number_after_prefix("CW", text)
+    return sw, cw
+
   def __get_weights(self):
     """ Gets the current and (if applicable) previous weight"""
 
@@ -343,7 +407,33 @@ class RedditAnalyzer:
     if weight_rvalue is not None:
       self.previous_weight = weight_rvalue['previous_weight']
       self.current_weight = weight_rvalue['current_weight']
+      return
     # time.sleep(4)
+
+    # Get weight by using SW: and CW:
+    sw1, cw1 = RedditAnalyzer.__get_sw_and_cw(self.title)
+    sw2, cw2 = RedditAnalyzer.__get_sw_and_cw(self.self_text)
+
+    sw = None
+    cw = None
+    if sw1:
+      sw = sw1
+    if cw1:
+      cw = cw1
+    if sw2:
+      sw = sw2
+    if cw2:
+      cw = cw2
+
+    # print "current weight: ", cw
+    # print "starting weight: ", sw
+    if cw:
+      self.previous_weight = sw
+      self.current_weight = cw
+      HITS_stats['sw_cw_identification'] += 1
+      return
+
+
 
     # New way to extract all weights
     self.get_potential_weights(self.self_text)
