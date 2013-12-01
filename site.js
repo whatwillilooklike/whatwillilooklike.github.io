@@ -385,9 +385,11 @@ $(document).ready(function(){
 
     var gender_str = $("input:radio[name=gender_radio]:checked").val();
     if (gender_str == "male"){
+      console.log("Male is checked.");
       global_gender_is_female = false;
       setGender("male");
     } else {
+      console.log("Female is checked.");
       global_gender_is_female = true;
       setGender("female");
     }
