@@ -319,7 +319,21 @@ function UpdateTable(){
   $ ( "#number_of_results").html(results.length.toString());
 }
 
+function updateResultsSize(){
+  console.log("updateResultsSize");
+  // TODO: change the height of the DIV
+  var other_content_height = 300;  // height of other content on page
+  var minimum_results_height = 400;
+  var results_height = Math.max(minimum_results_height, $(window).height() - other_content_height);
+  $("#image-list-group").height(results_height);
+}
+
 $(document).ready(function(){
+
+  updateResultsSize();
+  $(window).resize(function() {
+      updateResultsSize();
+  });
 
   // Default Global variables:
   global_gender_is_female = true; // because that is selected by default
