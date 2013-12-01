@@ -5,7 +5,7 @@ import pyimgur
 import re
 from urlparse import urlparse
 
-CLIENT_ID = 'c1a3920d783f7ea'
+CLIENT_ID = 'd8645c0ba36315b'
 # API_CALLS = 0
 im = pyimgur.Imgur(CLIENT_ID)
 
@@ -67,10 +67,10 @@ class Imgur:
     album_id = album_url.split('/')[-1]
     album = None
     try:
-      API_CALLS += 1
+      # API_CALLS += 1
       album = im.get_album(album_id)
     except:
-      print "***** Was not able to open the album: ", album_url
+      print "***** Was not able to open the album: ", album_url, " with id: ", album_id
       return None
       # return []
 
@@ -147,6 +147,9 @@ class Imgur:
          print "Imgur API is not responding to album requests...... Exiting. "
          print "Was looking up submission: ", submission.to_tuple()
          # I'll just return here, so it can still run
+         # With this code flow, we make sure that if we could not successuflly
+         # open an album and that contains non album images, we don't save anything
+         # ensuring that once we save image info, we have all of it.
          return
          # exit()
        imgur_album_image_urls += temp_images_for_album

@@ -323,7 +323,7 @@ class RedditAnalyzer:
   def reasonable_weight(weight):
     if weight < 80:
       return False
-    if weight > 400:
+    if weight > 500:
       return False
     return True
 
