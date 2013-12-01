@@ -340,7 +340,19 @@ function updateResultsSize(){
   $("#image-list-group").height(results_height);
 }
 
+function setGender(gender_str) {
+  if (gender_str == "male") {
+    $("#gender_logo_span").html('<i class="fa fa-male" style="color:#2B6BF6;"></i>');
+  } else if (gender_str == "female") {
+    $("#gender_logo_span").html('<i class="fa fa-female" style="color:#FE2EC8;"></i>');
+  }
+
+}
+
 $(document).ready(function(){
+
+  setGender("female");  // default gender selection
+
 
   updateResultsSize();
   $(window).resize(function() {
@@ -374,8 +386,10 @@ $(document).ready(function(){
     var gender_str = $("input:radio[name=gender_radio]:checked").val();
     if (gender_str == "male"){
       global_gender_is_female = false;
+      setGender("male");
     } else {
       global_gender_is_female = true;
+      setGender("female");
     }
 
     UpdateTable();

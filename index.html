@@ -8,6 +8,11 @@
 
   <script src="jquery-2.0.3.min.js"></script>
 
+
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
+
   <!-- Bootstrap -->
 
   <link rel="stylesheet" href="bootstrap.min.css">
@@ -99,32 +104,31 @@
 <div class="row">
   <div class="col-md-4">
     <div class="row">
-      <div class="col-md-12">
-        <h2 class="no-padding-or-margin">What will I look like?</h2>
+      <div class="col-md-9">
+        <h2 class="no-padding-or-margin">What will <span id="gender_logo_span"></span> look like?</h2>
         <br/>
       </div>
-    </div>
-    <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-3">
         <div class="btn-group" data-toggle="buttons">
           <label class="btn btn-default">
-            <input type="radio" name="gender_radio" value="male" id="gender_radio_male"> Male
+            <input type="radio" name="gender_radio" value="male" id="gender_radio_male"><i class="fa fa-male" style="font-size:1.5em;color:#2B6BF6;"></i>
           </label>
           <label class="btn btn-default active">
-            <input type="radio" name="gender_radio" value="female" id="gender_radio_female" checked> Female
+            <input type="radio" name="gender_radio" value="female" id="gender_radio_female" checked><i class="fa fa-female" style="font-size:1.5em;color:#FE2EC8;"></i>
           </label>
         </div>
        </div>
+      <!--
       <div class="col-md-6">
         <!--
         <label>
           <input id="nsfw_checkbox" type="checkbox"> Allow NSFW Images
         </label>
-        -->
-
         <br/>
       </div>
+      -->
     </div>
+
     <div class="row">
       <div class="col-md-12">
         <p>
@@ -171,17 +175,17 @@
 
     </div>
     <div class="row">
-      <div class="col-md-3">
-        Contact
+      <div class="col-md-5">
+        <a href="mailto:whatwillilooklike@gmail.com">Feedback/Contact</a>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-2">
         <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://whatwillilooklike.com" data-text="Check out what you'll look like with:" data-via="wwilooklike">Tweet</a>
 <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-4">
         <div class="fb-like" data-href="http://whatwillilooklike.com/" data-layout="button_count" data-action="like" data-show-faces="false" data-share="true"></div>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-1">
       </div>
     </div>
 
