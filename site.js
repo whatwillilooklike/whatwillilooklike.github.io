@@ -14,6 +14,7 @@ var global_max_height = null;
 var global_min_weight = null;
 var global_max_weight = null;
 
+var global_current_submission_id = null;
 
 function MergeSecondArrayIntoFirst(first, second){
   // Helper function which adds the submission entries which appear in second
@@ -49,6 +50,13 @@ function GetSubmissionWithId(submission_id){
 
 function LoadSubmission(submission_id){
   var submission = GetSubmissionWithId(submission_id);
+
+  if (!submission){
+    // Incase an invalid tag was supplied
+    return;
+  }
+
+
   // alert("Loaded submission with title: " + submission.title);
   var html_content = "<b>" + submission.title + "</b> <sup><a href='"+ submission.permalink +"' target='_blank'>[LINK]</a></sup><br/><br/>";
 
@@ -133,6 +141,10 @@ function LoadSubmission(submission_id){
 
   }
 
+  // Set the window hash now that we know the submission_id is valid
+  global_current_submission_id = submission_id;
+  window.location.hash = submission_id;
+  
   /*
   if (submission.media_embed_json){
     // html_content += "MEDIA_EMBED_JSON: " + submission.media_embed_json;
@@ -335,6 +347,14 @@ $(document).ready(function(){
       updateResultsSize();
   });
 
+  $(window).on('hashchange', function() {
+    console.log("hashchange!");
+    if (global_current_submission_id){
+      window.location.hash = global_current_submission_id;
+    }
+    // .. work ..
+  });
+
   // Default Global variables:
   global_gender_is_female = true; // because that is selected by default
   global_nsfw_checked = false; // same as above and below
@@ -397,6 +417,17 @@ $(document).ready(function(){
     raw_data = data.result;
     // console.log(result);
 
+    // If there is a hashtag, load the appropriate submission:
+    //
+    var hash = window.location.hash;
+    if (hash) {
+      hash = hash.substr(1);
+      if (hash != "") {
+        global_current_submission_id = hash;
+        LoadSubmission(hash);
+        console.log("If hash is true, hash = " + hash);
+      }
+    }
 
 
     // Figure out the min and max heights and weights using cross filter
