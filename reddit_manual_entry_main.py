@@ -25,7 +25,7 @@ def verify_submission_meets_criteria(submission):
 
 def main():
   time_taken = 0
-  query = 'SELECT * FROM submissions WHERE manually_marked = 0 and manually_verified = 0 and media_json NOT NULL;'
+  query = 'SELECT * FROM submissions WHERE manually_marked = 0 and manually_verified = 0 and media_json NOT NULL ORDER BY score DESC;'
   m = DatabaseManager(DATABASE_PATH)
 
   # TODO: get all unique user names
@@ -63,6 +63,8 @@ def main():
       print "ID: ", submission.id
       print "Title: ", t.bold(submission.title)
       print "Self text: ", submission.self_text
+      print "URL: ", submission.url
+      print "Score: ", submission.score
 
       print t.bold(t.red("CLASSIFICATION: " + r.get_debug_str()))
       print t.bold(t.red("LOW CONFIDENCE CLASSIFICATION: " + r.get_lc_debug_str()))
