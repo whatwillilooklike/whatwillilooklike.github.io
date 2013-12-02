@@ -345,6 +345,7 @@ function setGender(gender_str) {
     $("#gender_logo_span").html('<i class="fa fa-male" style="color:#2B6BF6;"></i>');
   } else if (gender_str == "female") {
     $("#gender_logo_span").html('<i class="fa fa-female" style="color:#FE2EC8;"></i>');
+    // $("#height-slider-range").children("div").css("background","#FE2EC8");
   }
 
 }
