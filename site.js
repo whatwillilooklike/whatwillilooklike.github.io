@@ -16,6 +16,8 @@ var global_max_weight = null;
 
 var global_current_submission_id = null;
 
+var global_units_imperial = true;
+
 function MergeSecondArrayIntoFirst(first, second){
   // Helper function which adds the submission entries which appear in second
   // but not in first, into first
@@ -164,14 +166,12 @@ function LoadSubmission(submission_id){
 
 }
 
-function InitializeHeightSlider(min_height, max_height) {
-  global_min_height = min_height;
-  global_max_height = max_height;
+function InitializeHeightSlider() {
   $("#height-slider-range").slider({
     range: true,
-    min: min_height,
-    max: max_height,
-    values: [min_height, max_height],
+    min: global_min_height,
+    max: global_max_height,
+    values: [global_min_height, global_max_height],
     slide: function(event, ui) {
       // console.log(JSON.toString(event));
       var min_height_obj = InchesToHeightObj(parseInt(ui.values[0]));
@@ -192,14 +192,12 @@ function InitializeHeightSlider(min_height, max_height) {
     " - " + HeightStringFromInt(parseInt($("#height-slider-range").slider("values", 1))));
 }
 
-function InitializeWeightSlider(min_weight, max_weight) {
-  global_min_weight = min_weight;
-  global_max_weight = max_weight;
+function InitializeWeightSlider() {
   $("#weight-slider-range").slider({
     range: true,
-    min: min_weight,
-    max: max_weight,
-    values: [min_weight, max_weight],
+    min: global_min_weight,
+    max: global_max_weight,
+    values: [global_min_weight, global_max_weight],
     slide: function(event, ui) {
       $("#weight").val(ui.values[0] + " lbs to " + ui.values[1] + " lbs");
     },
@@ -350,10 +348,16 @@ function setGender(gender_str) {
 
 }
 
+function setUnits() {
+  console.log("Setting units to: " + global_units_imperial);
+  InitializeHeightSlider(2,10);
+}
+
 $(document).ready(function(){
 
   setGender("female");  // default gender selection
 
+  global_units_imperial = true;
 
   updateResultsSize();
   $(window).resize(function() {
@@ -396,6 +400,26 @@ $(document).ready(function(){
     }
 
     UpdateTable();
+  });
+
+  $("input[name=units_radio]:radio").change(function () {
+    // TODO: optimization - even if the same option is selected again, this
+    // function gets called
+    // alert("Radio button changed.");
+
+    var units_str = $("input:radio[name=units_radio]:checked").val();
+    if (units_str == "imperial"){
+      console.log("Imperial is checked.");
+      global_units_imperial = true;
+      // setGender("male");
+    } else {
+      console.log("Metric is checked.");
+      global_units_imperial = false;
+      // setGender("female");
+    }
+    setUnits();
+
+    // UpdateTable();
   });
 
 
@@ -473,8 +497,13 @@ $(document).ready(function(){
 
     // var min_height = ;
 
-    InitializeHeightSlider(bottomHeight, topHeight);
-    InitializeWeightSlider(bottomWeight, topWeight);
+    global_min_height = bottomHeight;
+    global_max_height = topHeight;
+    InitializeHeightSlider();
+
+    global_min_weight = bottomWeight;
+    global_max_weight = topWeight;
+    InitializeWeightSlider();
 
     UpdateTable();
 
