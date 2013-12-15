@@ -3,11 +3,12 @@ __author__ = 'kyedidi'
 import json
 import pyimgur
 import re
+import secret
 from urlparse import urlparse
+from secret import IMGUR_CLIENT_ID
 
-CLIENT_ID = 'd8645c0ba36315b'
 # API_CALLS = 0
-im = pyimgur.Imgur(CLIENT_ID)
+im = pyimgur.Imgur(IMGUR_CLIENT_ID)
 
 class Imgur:
 

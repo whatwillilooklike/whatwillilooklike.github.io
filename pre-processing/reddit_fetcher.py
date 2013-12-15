@@ -5,6 +5,7 @@ from reddit_submission import Submission
 from reddit_database_manager import DatabaseManager
 from pprint import pprint
 import time
+from secret import REDDIT_USER_AGENT
 
 # For PRAW Documentation:
 # https://praw.readthedocs.org/en/latest/pages/code_overview.html
@@ -16,7 +17,7 @@ m = DatabaseManager(DATABASE_PATH)
 
 class RedditFetcher:
   def __init__(self, image_manager):
-    self.r = praw.Reddit(user_agent='reddit_image_fetcher')
+    self.r = praw.Reddit(user_agent=REDDIT_USER_AGENT)
     self.image_manager = image_manager
 
   def __update_given_submissions(self, submissions):
