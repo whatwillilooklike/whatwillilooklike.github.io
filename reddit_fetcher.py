@@ -98,7 +98,7 @@ class RedditFetcher:
 
   def update_posts(self):
     #submissions = r.get_subreddit('python').get_top(limit=10)
-    subreddits = ['progresspics', 'loseit', 'nakedprogress', 'brogress']
+    subreddits = ['progresspics', 'loseit', 'nakedprogress', 'brogress', 'keto', 'gainit']
     for subreddit in subreddits:
       self.update_subreddit(subreddit)
 

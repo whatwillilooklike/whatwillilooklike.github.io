@@ -26,16 +26,19 @@ def main():
   for submission in submissions:
     #submission.media_json = None
     #submission.media_embed_json = None
+    print "ID: ", submission.id
+    print "Title: ", submission.title
+    print "Selftext: ", submission.self_text
+    print "URL: ", submission.url
+
+    # print json_str
     try:
       Imgur.load_imgur_information_for_submission(submission)
     except:
       continue
-
-    print "Title: ", submission.title
-    print "Selftext: ", submission.self_text
-    print "URL: ", submission.url
+      print "------------------------------------------------------"
     print "Media JSON: ", submission.media_json
-    # print json_str
+
     print "--------------------------------------------------------------------------------"
 
     m.replace_submission(submission)
