@@ -65,19 +65,18 @@ class RedditFetcher:
 
     search_terms = ['pounds', 'lost', 'm', 'f', 'lbs', 'progress', 'pics',
                     'down', 'shape', 'starting', 'hoping', 'start', 'weight',
-                    'goal', 'NSFW', 'month', 'lose', 'gain', 'keto', 'bf', 'gf',
+                    'goal', 'month', 'lose', 'gain', 'keto', 'bf', 'gf',
                     '22', 'year','f/','m/', 'body', 'transformation', 'my',
                     'face', 'week', 'weeks', 'jeans', 'shorts', 'fit', 'finally',
                     'diet', 'exercise', 'abs', 'tummy', 'stomach', 'slow',
-                    'happy', 'huge', 'start', 'years', 'training', 'ladies',
+                    'happy', 'huge', 'start', 'years', 'training', 'ladies', 'guys'
                     'difference', 'support', 'proud', 'muscle', 'feeling',
                     'highest', 'getting', 'mo', 'achieved', 'realize', 'far',
                     'long', 'bikini', 'guys', 'conscious', 'photos',
                     'carb', 'waist', 'maintain', 'kept', 'proof', 'anyone', 'size',
                     'eat', 'eating', 'post', 'journey', 'went', 'down',
                     'heaviest', 'ago', 'diet', 'keep', 'approx', 'lifting', 'lift',
-                    'pictures', 'between', 'school', 'girl', 'girls',
-                    'dedication', 'confidence', 'girl friend', 'boy friend',
+                    'pictures', 'between', 'school', 'dedication', 'confidence',
                     'bulimia', 'anorexia', 'fat', 'thin', 'skinny', 'lean',
                     'abs', 'biceps', 'back', 'reddit']
     for search_term in search_terms:
