@@ -369,6 +369,7 @@ function setUnits() {
   // InitializeHeightSlider(2,10);
   InitializeHeightSlider();
   InitializeWeightSlider();
+  UpdateTable();
 }
 
 $(document).ready(function(){
