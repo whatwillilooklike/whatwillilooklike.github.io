@@ -199,7 +199,7 @@ function InitializeWeightSlider() {
     max: global_max_weight,
     values: [global_min_weight, global_max_weight],
     slide: function(event, ui) {
-      $("#weight").val(ui.values[0] + " lbs to " + ui.values[1] + " lbs");
+      $("#weight").val(WeightStringFromWeight(ui.values[0]) + " to " + WeightStringFromWeight(ui.values[1]) + " lbs");
     },
     stop: function(event, ui) {
       // console.log("Slider stopped.");
@@ -209,8 +209,8 @@ function InitializeWeightSlider() {
       // TODO: need to refresh the stuff at this time
     }
   });
-  $("#weight").val($( "#weight-slider-range").slider("values", 0) +
-    " lbs to " + $("#weight-slider-range").slider("values", 1) + " lbs");
+  $("#weight").val(WeightStringFromWeight($( "#weight-slider-range").slider("values", 0)) +
+    " to " + WeightStringFromWeight($("#weight-slider-range").slider("values", 1)));
 }
 
 function HTMLIdFromHTML(id){
@@ -366,7 +366,9 @@ function setGender(gender_str) {
 
 function setUnits() {
   console.log("Setting units to: " + global_units_imperial);
-  InitializeHeightSlider(2,10);
+  // InitializeHeightSlider(2,10);
+  InitializeHeightSlider();
+  InitializeWeightSlider();
 }
 
 $(document).ready(function(){
