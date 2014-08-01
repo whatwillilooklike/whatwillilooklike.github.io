@@ -240,9 +240,25 @@ function InchesToHeightObj(height_in){
   return {'feet': feet, 'inches': inches};
 }
 
+function InchesToCm(height_in) {
+  return height_in * 2.54;
+}
+
 function HeightStringFromInt(height_in){
-  var height_obj = InchesToHeightObj(height_in);
-  return height_obj.feet.toString() + '&#39;' + height_obj.inches.toString()
+  if (global_units_imperial) {
+    var height_obj = InchesToHeightObj(height_in);
+    return height_obj.feet.toString() + '&#39;' + height_obj.inches.toString();
+  } else {
+    return InchesToCm(height_in).toFixed(1).toString() + ' cm';
+  }
+}
+
+function WeightStringFromWeight(weight_lbs){
+  if (global_units_imperial) {
+    return weight_lbs.toString() + ' lbs'
+  } else {
+    return (weight_lbs / 2.2).toFixed(1).toString() + ' kg';
+  }
 }
 
 function GetStringTitle(current){
@@ -251,7 +267,7 @@ function GetStringTitle(current){
   var current_weight = current.current_weight_lbs;
 
   return (HeightStringFromInt(current.height_in) + ' / ' +
-      previous_weight.toString() + ' lbs &rarr; ' + current_weight.toString() + ' lbs');
+      WeightStringFromWeight(previous_weight) + ' &rarr; ' + WeightStringFromWeight(current_weight));
 }
 
 function UpdateTable(){
