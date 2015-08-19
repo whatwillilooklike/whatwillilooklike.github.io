@@ -7,7 +7,7 @@ var slider_settings = {
   };
 
 var global_gender_is_female = null;
-var global_nsfw_checked = null;
+// var global_nsfw_checked = null;
 // var global_sfw_checked = null;
 var global_min_height = null;
 var global_max_height = null;
@@ -70,11 +70,11 @@ function LoadSubmission(submission_id){
 
   $("#submission_content").html(html_content);
 
-  if (submission.media_json){
+  if (submission.photos){
     // submission_image_content
     var image_content_html = "";
 
-    // TODO: I just need to fetch all the images from an Imgur album and use on standard
+    // TODO: I just need to fetch all the photos from an Imgur album and use on standard
     // image viewer
     /*
     if ('imgur_albums' in submission.media_json && submission.media_json.imgur_albums){
@@ -90,26 +90,26 @@ function LoadSubmission(submission_id){
 
     var image_thumbnails_html = "";
 
-    if ('imgur_images' in submission.media_json && submission.media_json.imgur_images) {
 
-      for (var i = 0; i < submission.media_json.imgur_images.length; i++) {
 
-        // get the large thumbnail
-        var image_url = submission.media_json.imgur_images[i];
-        // image_url = image_url.substr(0, image_url.length-4);
-        var image_url_large = image_url + "l.jpg"
-        var image_url_small = image_url + "s.jpg"
-        // <li><img src="http://i.imgur.com/J7NnmFB.jpg" /></li>
-        console.log("large image: " + image_url_large);
+    for (var i = 0; i < submission.photos.length; i++) {
 
-        // image_content_html += '<img src="'+ image_url + '"> <br/><br/>';
-        image_content_html += '<li><img src="' + image_url_large + '" /></li>';
-        // <a data-slide-index="0" href=""><img src="http://i.imgur.com/J7NnmFBs.jpg" /></a>
-        image_thumbnails_html += '<a data-slide-index="' + i.toString() + '" href=""><img src="' + image_url_small + '" /></a>&nbsp;';
+      // get the large thumbnail
+      var image_url = submission.photos[i];
+      // image_url = image_url.substr(0, image_url.length-4);
+      var image_url_large = image_url + "l.jpg"
+      var image_url_small = image_url + "s.jpg"
+      // <li><img src="http://i.imgur.com/J7NnmFB.jpg" /></li>
+      console.log("large image: " + image_url_large);
 
-      }
-      console.log("Image content html: " + image_content_html);
+      // image_content_html += '<img src="'+ image_url + '"> <br/><br/>';
+      image_content_html += '<li><img src="' + image_url_large + '" /></li>';
+      // <a data-slide-index="0" href=""><img src="http://i.imgur.com/J7NnmFBs.jpg" /></a>
+      image_thumbnails_html += '<a data-slide-index="' + i.toString() + '" href=""><img src="' + image_url_small + '" /></a>&nbsp;';
+
     }
+    console.log("Image content html: " + image_content_html);
+
 
     /*
     if (!($("#bx-image-slider").length)) {
@@ -129,7 +129,7 @@ function LoadSubmission(submission_id){
     $("#bx-image-slider").html(image_content_html);
     // console.log("#bx-image-slider value: " + $("#bx-image-slider").val());
 
-    if (submission.media_json.imgur_images.length <= 1) {
+    if (submission.photos.length <= 1) {
       // Don't show thumbnails if there are none to show
       image_thumbnails_html = "";
     }
@@ -146,7 +146,7 @@ function LoadSubmission(submission_id){
   // Set the window hash now that we know the submission_id is valid
   global_current_submission_id = submission_id;
   window.location.hash = submission_id;
-  
+
   /*
   if (submission.media_embed_json){
     // html_content += "MEDIA_EMBED_JSON: " + submission.media_embed_json;
@@ -286,13 +286,14 @@ function UpdateTable(){
 
 
   // Filter by sfw / nsfw
+  /*
   var submissionsByNSFW = submissions.dimension(function(s) { return s.adult_content; });
   if (global_nsfw_checked == false){
     // Only one is set (not both or none)
     // we only filter if one of the variables is not true
     submissionsByNSFW.filter(false);
   }
-
+  */
 
   // Filter by height
   var submissionByHeight = submissions.dimension(function(s) {return s.height_in;});
@@ -393,7 +394,7 @@ $(document).ready(function(){
 
   // Default Global variables:
   global_gender_is_female = true; // because that is selected by default
-  global_nsfw_checked = false; // same as above and below
+  // global_nsfw_checked = false; // same as above and below
   //  global_sfw_checked = true; // because that is selected by default
 
   // $( "#image-list-group" ).empty();
@@ -442,6 +443,7 @@ $(document).ready(function(){
   });
 
 
+  /*
   $("#nsfw_checkbox").change(function(){
     // alert("NSFW checkboxes changed.");
     if ($('#nsfw_checkbox').prop('checked')){
@@ -452,6 +454,7 @@ $(document).ready(function(){
     }
     UpdateTable();
   });
+  */
 
 
   /*
