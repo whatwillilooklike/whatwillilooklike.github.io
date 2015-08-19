@@ -18,6 +18,12 @@ var global_current_submission_id = null;
 
 var global_units_imperial = true;
 
+function assert(condition, message) {
+    if (!condition) {
+        throw message || "Assertion failed";
+    }
+}
+
 function MergeSecondArrayIntoFirst(first, second){
   // Helper function which adds the submission entries which appear in second
   // but not in first, into first
@@ -476,9 +482,36 @@ $(document).ready(function(){
   });
 
   // alert("Atleast this is working.");
-  $.getJSON( "json_dump.json", function( data ) {
-    raw_data = data.result;
-    // console.log(result);
+  // $.getJSON( "json_dump.json", function( data ) {
+  
+  
+  Papa.parse("json_dump.csv", {
+  download: true,
+  dynamicTyping: true,
+  header:true,
+  skipEmptyLines:true,
+  complete: function(results) {
+    
+    // Using JSON
+    // raw_data = data.result;
+
+    // Parse the imgur urls:
+    raw_data = results.data; 
+    // console.log(raw_data);
+    // We skip the last row because it's incomplete (HACKKKK)
+    // raw_data.pop();
+    for (var i = 0; i < raw_data.length; i++){
+      // console.log(raw_data[i]);
+      //console.log(typeof raw_data[i].current_weight_lbs)
+      //assert(typeof raw_data[i].current_weight_lbs === 'number', 'Error: Weight is not a number');
+      raw_data[i]['photos'] = raw_data[i].photos.split(',');
+    }
+
+    
+    
+    // console.log(raw_data);
+
+
 
     // If there is a hashtag, load the appropriate submission:
     //
@@ -541,7 +574,7 @@ $(document).ready(function(){
     // TODO: only execute the line below if there are results to begin with...?(but should be the case)
     // SelectListElement(first_html_id);
 
-
+    } 
   });
 
 
