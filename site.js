@@ -498,8 +498,6 @@ $(document).ready(function(){
     // Parse the imgur urls:
     raw_data = results.data; 
     // console.log(raw_data);
-    // We skip the last row because it's incomplete (HACKKKK)
-    // raw_data.pop();
     for (var i = 0; i < raw_data.length; i++){
       // console.log(raw_data[i]);
       //console.log(typeof raw_data[i].current_weight_lbs)
