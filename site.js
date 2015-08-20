@@ -487,7 +487,7 @@ $(document).ready(function(){
   // $.getJSON( "json_dump.json", function( data ) {
   
   
-  Papa.parse("json_dump.csv", {
+  Papa.parse("csv_dump.csv", {
   download: true,
   dynamicTyping: true,
   header:true,
