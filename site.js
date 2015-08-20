@@ -66,7 +66,7 @@ function LoadSubmission(submission_id){
 
 
   // alert("Loaded submission with title: " + submission.title);
-  var html_content = "<b>" + submission.title + "</b> <sup><a href='"+ submission.permalink +"' target='_blank'>[LINK]</a></sup><br/><br/>";
+  var html_content = "<b>" + submission.title + "</b> <sup><a href='http://reddit.com/"+ submission.id +"' target='_blank'>[LINK]</a></sup><br/><br/>";
 
   /*
   if (submission.url) {
@@ -101,7 +101,9 @@ function LoadSubmission(submission_id){
     for (var i = 0; i < submission.photos.length; i++) {
 
       // get the large thumbnail
-      var image_url = submission.photos[i];
+      var image_id = submission.photos[i];
+      var image_url = 'http://imgur.com/' + image_id
+
       // image_url = image_url.substr(0, image_url.length-4);
       var image_url_large = image_url + "l.jpg"
       var image_url_small = image_url + "s.jpg"
