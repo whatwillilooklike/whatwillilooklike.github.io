@@ -1,0 +1,15 @@
+#controls ul li {
+    float:left;
+    margin-right:20px;
+}
+#container {
+    clear:both;
+}
+/**** Isotope filtering ****/
+.isotope-item {
+    z-index: 2;
+}
+.isotope-hidden.isotope-item {
+    pointer-events: none;
+    z-index: 1;
+}
