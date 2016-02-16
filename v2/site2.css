@@ -13,3 +13,7 @@
     pointer-events: none;
     z-index: 1;
 }
+
+.grid-item {
+    margin-bottom: 10px;
+}

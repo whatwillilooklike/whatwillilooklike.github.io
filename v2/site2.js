@@ -1,3 +1,19 @@
+var raw_data = null;
+
+// http://stackoverflow.com/questions/610406/javascript-equivalent-to-printf-string-format
+// First, checks if it isn't implemented yet.
+if (!String.prototype.format) {
+    String.prototype.format = function() {
+        var args = arguments;
+        return this.replace(/{(\d+)}/g, function(match, number) {
+            return typeof args[number] != 'undefined'
+                ? args[number]
+                : match
+                ;
+        });
+    };
+}
+
 function downloadContent(){
     Papa.parse("csv_dump.csv", {
         download: true,
@@ -6,9 +22,11 @@ function downloadContent(){
         skipEmptyLines:true,
         complete: function(results) {
 
+            var LIMIT = 100;  // Just for testing
+
             // Using JSON
             // raw_data = data.result;
-
+            // var limit = 100;
             // Parse the imgur urls:
             raw_data = results.data;
             // console.log(raw_data);
@@ -19,82 +37,45 @@ function downloadContent(){
                 raw_data[i]['photos'] = raw_data[i].photos.split(',');
             }
 
-
-
-            // console.log(raw_data);
-
-
-
-            // If there is a hashtag, load the appropriate submission:
             //
-            var hash = window.location.hash;
-            if (hash) {
-                hash = hash.substr(1);
-                if (hash != "") {
-                    global_current_submission_id = hash;
-                    LoadSubmission(hash);
-                    console.log("If hash is true, hash = " + hash);
+            for (var i = 0; i < raw_data.length; i++) {
+                if (i > LIMIT) {
+                    break;
                 }
+                console.log(JSON.stringify(raw_data[i]));
+                var current = raw_data[i];
+
+                var image_id = current.photos[0];  // we take the first image
+                var image_url = 'http://imgur.com/' + image_id
+
+                // image_url = image_url.substr(0, image_url.length-4);
+                var image_url_large = image_url + "l.jpg"
+                var image_url_medium = image_url + "m.jpg"
+                var image_url_small = image_url + "s.jpg"
+
+                // TODO - use something cleaner like strcat
+                var grid_element_html = '<div class="grid-item"><img src="grey.gif" height="400" width="400" data-original="{0}" alt="TODO" /></div>'.format(image_url_medium);
+                $( "#container" ).append(grid_element_html);
+
+                // alert(result[i]);
+                //Do something
             }
-
-
-            // Figure out the min and max heights and weights using cross filter
-
-            var submissions = crossfilter(raw_data);
-            var submissionsByHeight = submissions.dimension(function(d) { return d.height_in; });
-            // TODO: assumption that there was a result (because we are dereferencing [0]
-            var topHeight = submissionsByHeight.top(1)[0].height_in;
-            var bottomHeight = submissionsByHeight.bottom(1)[0].height_in;
-            console.log('top height: ' + topHeight + ' bottom height: ' + bottomHeight);
-
-            // TODO: deal with case when there is no Previous weight...?
-            var submissionsByPreviousWeight = submissions.dimension(function(d) { return d.previous_weight_lbs; });
-            var submissionsByCurrentWeight = submissions.dimension(function(d) { return d.current_weight_lbs; });
-
-            var topPreviousWeight = submissionsByPreviousWeight.top(1)[0].previous_weight_lbs;
-            var topCurrentWeight = submissionsByCurrentWeight.top(1)[0].current_weight_lbs;
-
-            var bottomPreviousWeight = submissionsByPreviousWeight.bottom(1)[0].previous_weight_lbs;
-            var bottomCurrentWeight = submissionsByCurrentWeight.bottom(1)[0].current_weight_lbs;
-
-            var topWeight = Math.max(topPreviousWeight, topCurrentWeight);
-            var bottomWeight = Math.min(bottomPreviousWeight, bottomCurrentWeight);
-
-
-
-            // var min_height = ;
-
-            global_min_height = bottomHeight;
-            global_max_height = topHeight;
-            InitializeHeightSlider();
-
-            global_min_weight = bottomWeight;
-            global_max_weight = topWeight;
-            InitializeWeightSlider();
-
-            UpdateTable();
-
-
-
-            // selected_id = IdFromHTMLId($("#image-list-group a:first-child").attr('id'));
-            // The first element
-
-            // $("#image-list-group a:first-child").addClass("active");
-            // Select the first element in the table
-            var first_html_id = $("#image-list-group a:first-child").attr('id');
-            // TODO: uncomment the line below
-            // TODO: only execute the line below if there are results to begin with...?(but should be the case)
-            // SelectListElement(first_html_id);
+            // Now that everything is added, NOW call the layout method
+            layoutGrid();
 
         }
     });
 }
 
-jQuery(document).ready(function ($) {
-    downloadContent();
+function layoutGrid() {
     var $win = $(window),
         $imgs = $("img"),
-        $con = $('#container').isotope();
+        $con = $('#container').isotope({
+            masonry: {
+                columnWidth: 50,
+                gutter: 10
+            }
+        });
 
     function loadVisible($els, trigger) {
         $els.filter(function () {
@@ -146,4 +127,9 @@ jQuery(document).ready(function ($) {
             sortBy: 'original'
         });
     });
+}
+
+jQuery(document).ready(function ($) {
+    downloadContent();
+
 });
