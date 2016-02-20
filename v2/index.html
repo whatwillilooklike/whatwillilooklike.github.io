@@ -51,6 +51,12 @@
 
     -->
 
+    <!-- Start Lightbox -->
+    <link type="text/css" rel="stylesheet" href="lightGallery.min.css" />
+    <script type="text/javascript" src="lightgallery.min.js" defer></script>
+    <script src="lg-thumbnail.min.js" defer></script>
+    <!-- End Lightbox -->
+
     <script src="infinity.min.js" defer></script>
     <script src="papaparse.min.js" defer></script>
     <script src="site2.js" defer></script>
@@ -64,6 +70,16 @@
 </head>
 <body>
 <h1>fitspire.me</h1>
+
+<!--
+Lightbox. It's hidden because we click it indirectly.
+
+-->
+
+<div id="lightgallery" style="display: none;">
+</div>
+
+
 <div id="container">
     <div id="float-wrap">
         <!--

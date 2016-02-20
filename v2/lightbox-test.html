@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link type="text/css" rel="stylesheet" href="lightGallery.min.css" />
+    <script type="text/javascript" src="jquery-2.2.0.min.js"></script>
+    <script type="text/javascript" src="lightgallery.min.js"></script>
+    <script src="lg-thumbnail.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+
+
+        });
+
+        function buildGallery() {
+            // Add images
+
+            $lg = $("#lightgallery");
+            var html = '<a href="http://imgur.com/old22m.jpg" id="first_image"> <img src="http://imgur.com/old22m.jpg" /> </a> <a href="http://imgur.com/W0BpBm.jpg"> <img src="http://imgur.com/W0BpBm.jpg" /> </a>';
+            $lg.html(html);
+            $("#lightgallery").lightGallery();
+        }
+
+        function destroyGallery() {
+            $lg = $("#lightgallery");
+            $lg.data('lightGallery').destroy(true);
+        }
+
+        function openGallery() {
+            // TODO: open the gallery
+            $('#first_image').click();
+
+        }
+    </script>
+</head>
+<body>
+
+<button onclick="buildGallery();">Build Gallery!</button>
+<button onclick="openGallery();">Open Gallery!</button>
+<button onclick="destroyGallery();">Destroy Gallery!</button>
+<br/><br/><br/>
+<div id="lightgallery" style="visibility: hidden;">
+
+
+</div>
+<!--
+
+http://imgur.com/old22m.jpg
+
+-->
+
+
+</body>
+</html>

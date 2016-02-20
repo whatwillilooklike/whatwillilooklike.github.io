@@ -7,6 +7,62 @@ var raw_data = null;
 var imageWidth = 400;
 var columnBorderWidth = 20;  // border on each side of a column
 
+function destroyLightBox() {
+    $lg = $("#lightgallery");
+    if ($lg.data('lightGallery') === undefined) {
+        return;
+    }
+    $lg.data('lightGallery').destroy(true);
+    $lg.html('');  // clear html
+}
+
+function lightboxImage(image_id, first_image) {
+    var image_url = imageUrlForImageID(image_id, 'l');
+    var $a = $("<a>", {href: image_url});
+    if (first_image == true) {
+        $a.attr('id', 'first_image');
+    }
+    var $image = $("<img>", {src: image_url});
+    $a.append($image);
+    return $a;
+}
+
+function openLightBox(index) {
+    // index is the index in raw_data (TODO - need to rename raw_data)
+    // alert('images: ' + JSON.stringify(raw_data[index].photos));
+
+    // Just in case:
+    destroyLightBox();
+
+    // Build lightbox
+    $lg = $("#lightgallery");
+    // var $first_image = $("<img>", {id: 'first_image', src: ''});
+    // var html = '<a href="http://imgur.com/old22m.jpg" id="first_image"> <img src=" /> </a> <a href="http://imgur.com/W0BpBm.jpg"> <img src="http://imgur.com/W0BpBm.jpg" /> </a>';
+    var a = lightboxImage('old22', true);
+    var b = lightboxImage('W0BpB', false);
+    $lg.append(a);
+    $lg.append(b);
+    // $lg.html(html);
+    $("#lightgallery").lightGallery();
+
+    // Launch Lightbox
+    $('#first_image').click();
+
+    // We destroy Lightbox on close
+    // Hopefully this thing doesn't have memory leaks
+    $lg.on('onCloseAfter.lg',function(event){
+        // onCloseAfter.lg;
+        destroyLightBox();
+    });
+
+}
+
+function imageUrlForImageID(image_id, size) {
+    // size has to be 's', 'm', or 'l'
+    var image_url = 'http://imgur.com/' + image_id + size + '.jpg';
+    return image_url;
+}
+
 function row() {
     var colIndex, length, $minCol, $currCol;
     for (var i = 0, length = columns.length; i < length; i++) {// for(index = 0, length = columns.length; index < length; index++) {
@@ -45,12 +101,12 @@ function row() {
         var current = raw_data[nextIndexForPhoto];
 
         var image_id = current.photos[0];  // we take the first image
-        var image_url = 'http://imgur.com/' + image_id;
+        // var image_url = 'http://imgur.com/' + image_id;
 
         // image_url = image_url.substr(0, image_url.length-4);
-        var image_url_large = image_url + "l.jpg";
-        var image_url_medium = image_url + "m.jpg";
-        var image_url_small = image_url + "s.jpg";
+        // var image_url_large = image_url + "l.jpg";
+        var image_url_medium = imageUrlForImageID(image_id, 'm');
+        var image_url_small = imageUrlForImageID(image_id, 's');
 
         // TODO - use something cleaner like strcat
         var gender_string = "";
@@ -66,7 +122,7 @@ function row() {
         // all_grid_element_html.push(grid_elemen);
         // all_grid_element_html = all_grid_element_html + grid_element_html;
         // var html = compiled({'image_url': image_url_medium});
-        var html = '<div><img class="lazy-img" data-original="' + image_url_medium + '" height="400" width="400" /></div>';
+        var html = '<div><img onclick="openLightBox('+ nextIndexForPhoto +')" class="lazy-img" data-original="' + image_url_medium + '" height="400" width="400" /></div>';
 
         // Append it to the column with the lowest height
         $minCol.data('listView').append(html);
