@@ -13,7 +13,7 @@ function destroyLightBox() {
         return;
     }
     $lg.data('lightGallery').destroy(true);
-    $lg.html('');  // clear html
+    $lg.empty();  // clear html
 }
 
 function lightboxImage(image_id, first_image) {
@@ -32,18 +32,25 @@ function openLightBox(index) {
     // alert('images: ' + JSON.stringify(raw_data[index].photos));
 
     // Just in case:
+    console.log('openLightBox called with index = ' + index);
     destroyLightBox();
 
     // Build lightbox
     $lg = $("#lightgallery");
     // var $first_image = $("<img>", {id: 'first_image', src: ''});
     // var html = '<a href="http://imgur.com/old22m.jpg" id="first_image"> <img src=" /> </a> <a href="http://imgur.com/W0BpBm.jpg"> <img src="http://imgur.com/W0BpBm.jpg" /> </a>';
-    var a = lightboxImage('old22', true);
-    var b = lightboxImage('W0BpB', false);
-    $lg.append(a);
-    $lg.append(b);
+
+    var current = raw_data[index];
+    // var image_id = current.photos[0];
+    for (var i = 0; i < current.photos.length; i++) {
+        var image_id = current.photos[i];
+        var lightBox = lightboxImage(image_id, i == 0);  // so we mark the first image as first_image
+        $lg.append(lightBox);
+    }
     // $lg.html(html);
-    $("#lightgallery").lightGallery();
+    $("#lightgallery").lightGallery({
+        'download': false
+    });
 
     // Launch Lightbox
     $('#first_image').click();
@@ -76,7 +83,7 @@ function row() {
             if(!$minCol) $minCol = $currCol;
 
             // The bug is that the CSS in the HTML makes each column think it's the same height
-            if ($currCol.height() <= $minCol.height()) {
+            if ($currCol.height() < $minCol.height()) {
                 $minCol = $currCol;
             }
             //  else $minCol = $minCol.height() > $currCol.height() ? $currCol : $minCol;
