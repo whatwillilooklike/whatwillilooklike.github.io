@@ -4,8 +4,8 @@ var columns = null;
 var nextIndexForPhoto = 0;
 var raw_data = null;
 
-var imageWidth = null;
-var columnBorderWidth = null;  // border on each side of a column
+var imageWidth = 400;
+var columnBorderWidth = 20;  // border on each side of a column
 
 function row() {
     var colIndex, length, $minCol, $currCol;
@@ -138,17 +138,18 @@ $(document).ready(function() {
 
 
     // TODO - assert
-    imageWidth = $('.left-floater').css('width');
-    columnBorderWidth = $('.left-floater').css('border-left-width');
-    console.log('imageWidth:' + imageWidth);
-    console.log('columnBorderWidth:' + columnBorderWidth);
     console.log('windowWidth: ' + $( window ).width());
-    console.log('documentWidth: ' + $( document ).width());
+    // console.log('documentWidth: ' + $( document ).width());
 
-    var num_columns = 2;
+    var num_columns = Math.max(1, Math.floor($(window).width() / (imageWidth + 2 * columnBorderWidth)));
+    // var num_columns = 2;
+    console.log('num_columns: ' + num_columns);
     for (var i = 0; i < num_columns; i++) {
-        var html = '<div class="infinite infinite-scroll-column"></div>';
-        $('#float-wrap').append(html);
+        var $div = $("<div>", {class: "infinite infinite-scroll-column"});
+        $div.css('border-left-width', columnBorderWidth);
+        $div.css('border-right-width', columnBorderWidth);
+        // var html = '<div class="infinite infinite-scroll-column"></div>';
+        $('#float-wrap').append($div);
     }
 
 

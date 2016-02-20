@@ -23,18 +23,18 @@
         }
         */
         #float-wrap {
-            /* 816 = <number of floats> * (<float width> + 2 * <float border width>) */
-            width: 2000px;
-            /*border: 1px solid;*/
-            /* causes .float-wrap's height to match its child divs */
-            /*overflow: auto;*/
+            text-align:center;
+            white-space: nowrap;
         }
         .infinite-scroll-column {
-            width: 400px;
+            /*width: 400px;*/
             /*height: 100px;*/
-            border-width: 50px;
+            /*border width is set inside of CSS */
+            /*border-width: 20px;*/
             border-style: solid;
-            float: left;
+            border-color: yellow;
+            /*float: left;*/
+            display:inline-block;
         }
         .outer {
             overflow-x: scroll;
