@@ -61,10 +61,36 @@
             font-family: sans-serif;
         }
 
+        .input_parameters_boxes {
+            display:inline-block;
+            vertical-align:top;
+            border-style: solid;
+            border-color:transparent;
+            border-width: 20px;
+            vertical-align: top;
+        }
+
+        #options-wrapper {
+            background-color: lightyellow;
+        }
+
+        input[type="radio"]{
+            display: none;
+        }
+
+        input[type="radio"]+label{
+            cursor: pointer;
+        }
+
+        input[type="radio"]:not(:checked)+label{ color: lightgray; }
+
+
     </style>
 
-
+    <link href="nouislider.css" rel="stylesheet">
+    <script src="nouislider.min.js" defer></script>
     <script src="jquery-2.2.0.min.js" defer></script>
+    <script src="crossfilter.min.js" defer></script>
 
     <!--
 
@@ -83,6 +109,8 @@
     <script src="site2.js" defer></script>
     <link rel="stylesheet" type="text/css" href="site2.css">
 
+    <link rel="stylesheet" href="font-awesome.min.css">
+
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <title>TODO</title>
 
@@ -92,6 +120,38 @@
 <body>
 <h1>fitspire.me</h1>
 
+<div id="options-wrapper">
+    <div id="weight-wrapper" class="input_parameters_boxes" style="width:300px;">
+        <div id="slider-range-weight"></div>
+        <br/>
+        <div id="selected_weight" style="text-align: center;">hello</div>
+    </div>
+    <div id="height-wrapper" class="input_parameters_boxes" style="width:300px;">
+        <div id="slider-range-height"></div>
+        <br/>
+        <div id="selected_height" style="text-align: center;">hello</div>
+    </div>
+    <!-- Gender Selector -->
+    <div class="input_parameters_boxes">
+        <input type="radio" name="gender_radio" id="male_radio" class="radio" value="male" />
+            <label id="male_radio_label" for="male_radio"><i class="fa fa-mars fa-2x"></i></label>
+        <input type="radio" name="gender_radio" id="female_radio" class="radio" value="female" checked/>
+            <label id="female_radio_label" for="female_radio"><i class="fa fa-venus fa-2x"></i></label>
+    </div>
+
+    <!-- Metric or English Selector -->
+    <div class="input_parameters_boxes">
+        <input type="radio" name="units_radio" id="english_radio" class="radio" value="english" checked/>
+            <label for="english_radio">English</label>
+        <input type="radio" name="units_radio" id="metric_radio" class="radio" value="metric" />
+            <label for="metric_radio">Metric</label>
+    </div>
+
+</div>
+
+<br/>
+<br/>
+<hr/>
 <!--
 Lightbox. It's hidden because we click it indirectly.
 

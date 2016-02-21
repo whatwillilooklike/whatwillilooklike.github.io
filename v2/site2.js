@@ -3,13 +3,18 @@ var listView = null;
 var columns = null;
 var nextIndexForPhoto = 0;
 var raw_data = null;
+var filtered_submissions = null;
 
 var imageWidth = 400;
 var columnBorderWidth = 20;  // border on each side of a column
 
 var compiledImageEntryTemplate =  _.template($('#image-entry-template').html());
+
+var global_gender_is_female = null;
 var global_units_imperial = true;
 
+var rangeSliderWeight = null;
+var rangeSliderHeight = null;
 
 function InchesToHeightObj(height_in){
     var feet = Math.floor(height_in / 12);
@@ -191,6 +196,65 @@ function row() {
     }
 }
 
+
+function resetBoxes(){
+    // Function that is called when any of the filtering or options are set.
+    // Set the slider min and max
+
+    var submissions = crossfilter(raw_data);
+
+    // Filter by gender
+    var submissionsByGender = submissions.dimension(function(s) { return s.gender; });
+    submissionsByGender.filter(global_gender_is_female);
+
+    // Filter by sfw / nsfw
+    /*
+     var submissionsByNSFW = submissions.dimension(function(s) { return s.adult_content; });
+     if (global_nsfw_checked == false){
+     // Only one is set (not both or none)
+     // we only filter if one of the variables is not true
+     submissionsByNSFW.filter(false);
+     }
+     */
+
+    /*
+    // Filter by height
+    var submissionByHeight = submissions.dimension(function(s) {return s.height_in;});
+    submissionByHeight.filter([global_min_height, global_max_height + 1]); // TODO: add + Math.MIN_VALUE
+
+    console.log('global min height= ' + global_min_height);
+    console.log('global max height= ' + global_max_height);
+
+    // Filter by weight
+    var submissionByCurrentWeight = submissions.dimension(function(s) {return s.current_weight_lbs;});
+    submissionByCurrentWeight.filter([global_min_weight, global_max_weight + 1]);
+
+    var unsorted_results = submissionByCurrentWeight.top(Infinity);
+
+    submissionByCurrentWeight.filterAll(); // Need to clear that filter
+
+    var submissionByPreviousWeight = submissions.dimension(function(s) {return s.previous_weight_lbs;});
+    submissionByPreviousWeight.filter([global_min_weight, global_max_weight + 1]);
+
+    var secondary_results = submissionByPreviousWeight.top(Infinity);
+
+    MergeSecondArrayIntoFirst(unsorted_results, secondary_results);
+
+    // Create another crossfilter for this data to sort it by the score
+    var cf2 = crossfilter(unsorted_results);
+    var submissionByScore = cf2.dimension(function(s) {return s.score;});
+    var results = submissionByScore.top(Infinity);
+    */
+
+}
+
+function drawMoreBoxes(){
+    var LIMIT = 10;  // Just for testing. Number of rows to draw
+    for (var i = 0; i < LIMIT; i ++ ) {
+        row();
+    }
+}
+
 function downloadContent(){
     Papa.parse("csv_dump.csv", {
         download: true,
@@ -198,15 +262,16 @@ function downloadContent(){
         header:true,
         skipEmptyLines:true,
         complete: function(results) {
+            raw_data = results.data;
 
-            var LIMIT = 10;  // Just for testing
+
 
 
             // Using JSON
             // raw_data = data.result;
             // var limit = 100;
             // Parse the imgur urls:
-            raw_data = results.data;
+
             // console.log(raw_data);
             for (var i = 0; i < raw_data.length; i++){
                 // console.log(raw_data[i]);
@@ -215,14 +280,9 @@ function downloadContent(){
                 raw_data[i]['photos'] = raw_data[i].photos.split(',');
             }
 
+            resetBoxes();
+            drawMoreBoxes();
 
-            //
-            var all_grid_element_html = [];
-
-
-            for (var i = 0; i < LIMIT; i ++ ) {
-                row();
-            }
 
             // Now that everything is added, NOW call the layout method
             // layoutGrid()
@@ -253,6 +313,68 @@ function getMethods(obj) {
 $(document).ready(function() {
     console.log('hello!');
     // var $el = $('#my-infinite-container');
+
+    // TODO - set gender and english radio
+    //$('input:radio[name="gender_radio"]').filter('[value="female"]').attr('checked', true);
+    //$('input:radio[name="units_radio"]').filter('[value="english"]').attr('checked', true);
+    global_gender_is_female = true;
+    $('input:radio[name=gender_radio]')[1].checked = true;  // select Female by default
+    $('input:radio[name=units_radio]')[0].checked = true;  // select english by default
+
+    $("input[name='gender_radio']").change(function() {
+        console.log("gender_radio changed");
+    });
+
+    $("input[name='units_radio']").change(function() {
+        console.log("units_radio changed");
+    });
+
+    // TODO - set up Slider
+    rangeSliderWeight = document.getElementById('slider-range-weight');
+
+    noUiSlider.create(rangeSliderWeight, {
+        start: [ 100],
+        step: 1,
+        range: {
+            'min': [  100 ],
+            'max': [ 550 ],
+        }
+    });
+    rangeSliderWeight.noUiSlider.on('update', function( values, handle ) {
+        // console.log('values: ' + values);
+        // $('#selected_weight').val(values[0]);
+        var rangeSliderValueElement = document.getElementById('selected_weight');
+        rangeSliderValueElement.innerHTML = values[handle];
+        // rangeSliderValueElement.innerHTML = values[handle];
+    });
+
+
+    // Height
+    rangeSliderHeight = document.getElementById('slider-range-height');
+
+    noUiSlider.create(rangeSliderHeight, {
+        start: [ 48,  96],
+        step: 1,
+        connect: true,
+        range: {
+            'min': [  48 ],
+            'max': [ 96 ]
+        }
+    });
+    rangeSliderHeight.noUiSlider.on('update', function( values, handle ) {
+        // console.log('values: ' + values);
+        // $('#selected_weight').val(values[0]);
+        var rangeSliderValueElement = document.getElementById('selected_height');
+        rangeSliderValueElement.innerHTML = values[handle];
+        // rangeSliderValueElement.innerHTML = values[handle];
+    });
+
+    rangeSliderWeight.noUiSlider.updateOptions({
+        range: {
+            'min': 50,
+            'max': 200
+        }
+    });
 
 
     // TODO - assert
@@ -320,13 +442,13 @@ $(document).ready(function() {
     $(window).on('scroll', function() {
         if(!updateScheduled) {
             setTimeout(function() {
-                if(onscreen(spinner)) downloadContent();
+                if(onscreen(spinner)) drawMoreBoxes();
                 updateScheduled = false;
             }, 500);
             updateScheduled = true;
         }
     });
-    
+
 
     // Lazy load images
     // downloadContent();
