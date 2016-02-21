@@ -2,7 +2,7 @@ var listView = null;
 // var compiled = _.template('<span><img class="lazy-img" data-original="${image_url}" height="400" width="400" /></span><br/>');
 var columns = null;
 var nextIndexForPhoto = 0;
-var raw_data = null;
+var raw_data = null;  // never use raw_data for results. use filtered_submissions
 var filtered_submissions = null;
 
 var imageWidth = 400;
@@ -10,9 +10,9 @@ var columnBorderWidth = 20;  // border on each side of a column
 
 var compiledImageEntryTemplate =  _.template($('#image-entry-template').html());
 
-var global_gender_is_female = null;
 var global_units_imperial = true;
 
+var last_selected_weight = null;
 var rangeSliderWeight = null;
 var rangeSliderHeight = null;
 
@@ -88,7 +88,7 @@ function openLightBox(index) {
     // var $first_image = $("<img>", {id: 'first_image', src: ''});
     // var html = '<a href="http://imgur.com/old22m.jpg" id="first_image"> <img src=" /> </a> <a href="http://imgur.com/W0BpBm.jpg"> <img src="http://imgur.com/W0BpBm.jpg" /> </a>';
 
-    var current = raw_data[index];
+    var current = filtered_submissions[index];
     // var image_id = current.photos[0];
     for (var i = 0; i < current.photos.length; i++) {
         var image_id = current.photos[i];
@@ -119,6 +119,10 @@ function imageUrlForImageID(image_id, size) {
     return image_url;
 }
 
+function resetSpinner(){
+    $('#spinner-div').html("<img src='spinner.gif' class=spinner alt='Loading...'>");
+}
+
 function row() {
     var colIndex, length, $minCol, $currCol;
     for (var i = 0, length = columns.length; i < length; i++) {// for(index = 0, length = columns.length; index < length; index++) {
@@ -147,14 +151,21 @@ function row() {
         */
 
         // If we don't have any more results to show
-        if (nextIndexForPhoto > raw_data.length) {
+        if (nextIndexForPhoto >= filtered_submissions.length) {
             // TODO - I need to handle this case better so it doesn't get here.
             // Best I can do for now.
+            // TODO - I should display something to tell users there are no more submissions
+            $('#spinner-div').html("No more results.");
             return;
+        } else {
+            // Show spinner
+            resetSpinner();
+
+
         }
 
         // console.log(JSON.stringify(raw_data[i]));
-        var current = raw_data[nextIndexForPhoto];
+        var current = filtered_submissions[nextIndexForPhoto];
 
         var image_id = current.photos[0];  // we take the first image
         // var image_url = 'http://imgur.com/' + image_id;
@@ -196,16 +207,95 @@ function row() {
     }
 }
 
+function MergeSecondArrayIntoFirst(first, second){
+    // Helper function which adds the submission entries which appear in second
+    // but not in first, into first
+    var used_ids = {};
+    for (var i = 0; i < first.length; i++){
+        var obj = first[i];
+        used_ids[obj.id] = true;
+    }
+
+    for (var i = 0; i < second.length; i++){
+        var obj = second[i];
+        if (!(obj.id in used_ids)){
+            first.push(obj);
+        }
+    }
+    return;
+}
+
+function isGenderFemale(){
+    // Return value of radio == female
+    return $("input[name=gender_radio]:checked").val() == 'female';
+}
 
 function resetBoxes(){
     // Function that is called when any of the filtering or options are set.
-    // Set the slider min and max
+    resetSpinner();
 
+    console.log('resetBoxes called!');
+    // Reset Columns Views
+    // columns = $('.infinite');
+
+    if (columns !== null) {
+        console.log('resetting ' + columns.length  +'columns');
+        columns.each(function() {
+            // remove
+            $(this).data('listView').remove();
+        });
+    }
+
+
+    console.log('windowWidth: ' + $( window ).width());
+    // console.log('documentWidth: ' + $( document ).width());
+
+    var num_columns = Math.max(1, Math.floor($(window).width() / (imageWidth + 2 * columnBorderWidth)));
+    // var num_columns = 2;
+    console.log('num_columns: ' + num_columns);
+    $('#float-wrap').html('');  // Clear the container for the infinite columns
+    for (var i = 0; i < num_columns; i++) {
+        var $div = $("<div>", {class: "infinite infinite-scroll-column"});
+        $div.css('border-left-width', columnBorderWidth);
+        $div.css('border-right-width', columnBorderWidth);
+        // var html = '<div class="infinite infinite-scroll-column"></div>';
+        $('#float-wrap').append($div);
+    }
+
+
+    columns = $('.infinite');
+    console.assert(columns.length > 0, "No columns present!");
+
+    columns.each(function() {
+        listView = new infinity.ListView($(this), {
+            lazy: function(){
+                $(this).find('.lazy-img').each(function() {
+                    var $ref = $(this);
+                    $ref.attr('src', $ref.attr('data-original'));
+                });
+                // console.log('elem data: ' + getMethods(elem));
+                // console.log('elem attr: ' + elem.getAttribute('data-original'));
+                // $(elem).attr('src', $(elem).attr('data-original'));}
+            }
+        });
+        $(this).data('listView', listView);
+    });
+
+    // We reset the index since we're resetting the boxes
+    nextIndexForPhoto = 0;
+
+
+
+
+
+
+
+    console.assert(raw_data !== null, "No data present!");
     var submissions = crossfilter(raw_data);
 
     // Filter by gender
     var submissionsByGender = submissions.dimension(function(s) { return s.gender; });
-    submissionsByGender.filter(global_gender_is_female);
+    submissionsByGender.filter(isGenderFemale());
 
     // Filter by sfw / nsfw
     /*
@@ -216,25 +306,45 @@ function resetBoxes(){
      submissionsByNSFW.filter(false);
      }
      */
+    // filtered_submissions = submissionsByGender.top(Infinity);
+
+
 
     /*
     // Filter by height
     var submissionByHeight = submissions.dimension(function(s) {return s.height_in;});
+
     submissionByHeight.filter([global_min_height, global_max_height + 1]); // TODO: add + Math.MIN_VALUE
 
     console.log('global min height= ' + global_min_height);
     console.log('global max height= ' + global_max_height);
+    */
 
     // Filter by weight
+
     var submissionByCurrentWeight = submissions.dimension(function(s) {return s.current_weight_lbs;});
-    submissionByCurrentWeight.filter([global_min_weight, global_max_weight + 1]);
+    var submissionByPreviousWeight = submissions.dimension(function(s) {return s.previous_weight_lbs;});
+    // Get the top weight
+    var topPreviousWeight = submissionByPreviousWeight.top(1)[0].previous_weight_lbs;
+    var topCurrentWeight = submissionByCurrentWeight.top(1)[0].current_weight_lbs;
+
+    var bottomPreviousWeight = submissionByPreviousWeight.bottom(1)[0].previous_weight_lbs;
+    var bottomCurrentWeight = submissionByCurrentWeight.bottom(1)[0].current_weight_lbs;
+
+    var topWeight = Math.max(topPreviousWeight, topCurrentWeight);
+    var bottomWeight = Math.min(bottomPreviousWeight, bottomCurrentWeight);
+
+
+    var selectedTopWeight = rangeSliderWeight.noUiSlider.get();
+    var selectedBottomWeight = rangeSliderWeight.noUiSlider.get();
+
+    submissionByCurrentWeight.filter([selectedBottomWeight, selectedTopWeight + 1]);
 
     var unsorted_results = submissionByCurrentWeight.top(Infinity);
 
     submissionByCurrentWeight.filterAll(); // Need to clear that filter
 
-    var submissionByPreviousWeight = submissions.dimension(function(s) {return s.previous_weight_lbs;});
-    submissionByPreviousWeight.filter([global_min_weight, global_max_weight + 1]);
+    submissionByPreviousWeight.filter([selectedBottomWeight, selectedTopWeight + 1]);
 
     var secondary_results = submissionByPreviousWeight.top(Infinity);
 
@@ -243,8 +353,17 @@ function resetBoxes(){
     // Create another crossfilter for this data to sort it by the score
     var cf2 = crossfilter(unsorted_results);
     var submissionByScore = cf2.dimension(function(s) {return s.score;});
-    var results = submissionByScore.top(Infinity);
-    */
+    filtered_submissions = submissionByScore.top(Infinity);
+
+
+    // Set the slider min and max
+    rangeSliderWeight.noUiSlider.updateOptions({
+        step: 1,
+        range: {
+            'min': bottomWeight,
+            'max': topWeight
+        }
+    });
 
 }
 
@@ -317,12 +436,13 @@ $(document).ready(function() {
     // TODO - set gender and english radio
     //$('input:radio[name="gender_radio"]').filter('[value="female"]').attr('checked', true);
     //$('input:radio[name="units_radio"]').filter('[value="english"]').attr('checked', true);
-    global_gender_is_female = true;
     $('input:radio[name=gender_radio]')[1].checked = true;  // select Female by default
     $('input:radio[name=units_radio]')[0].checked = true;  // select english by default
 
     $("input[name='gender_radio']").change(function() {
         console.log("gender_radio changed");
+        resetBoxes();
+        drawMoreBoxes();
     });
 
     $("input[name='units_radio']").change(function() {
@@ -348,6 +468,17 @@ $(document).ready(function() {
         // rangeSliderValueElement.innerHTML = values[handle];
     });
 
+    rangeSliderWeight.noUiSlider.on('set', function( values, handle ) {
+        var selectedWeight = values[handle];
+        console.log('selectedWeight: ' + selectedWeight);
+        if (selectedWeight != last_selected_weight) {
+            last_selected_weight = selectedWeight;
+            resetBoxes();
+            drawMoreBoxes();
+        }
+
+    });
+
 
     // Height
     rangeSliderHeight = document.getElementById('slider-range-height');
@@ -367,49 +498,13 @@ $(document).ready(function() {
         var rangeSliderValueElement = document.getElementById('selected_height');
         rangeSliderValueElement.innerHTML = values[handle];
         // rangeSliderValueElement.innerHTML = values[handle];
-    });
 
-    rangeSliderWeight.noUiSlider.updateOptions({
-        range: {
-            'min': 50,
-            'max': 200
-        }
     });
 
 
-    // TODO - assert
-    console.log('windowWidth: ' + $( window ).width());
-    // console.log('documentWidth: ' + $( document ).width());
-
-    var num_columns = Math.max(1, Math.floor($(window).width() / (imageWidth + 2 * columnBorderWidth)));
-    // var num_columns = 2;
-    console.log('num_columns: ' + num_columns);
-    for (var i = 0; i < num_columns; i++) {
-        var $div = $("<div>", {class: "infinite infinite-scroll-column"});
-        $div.css('border-left-width', columnBorderWidth);
-        $div.css('border-right-width', columnBorderWidth);
-        // var html = '<div class="infinite infinite-scroll-column"></div>';
-        $('#float-wrap').append($div);
-    }
 
 
-    columns = $('.infinite');
-    console.assert(columns.length > 0, "No columns present!");
 
-    columns.each(function() {
-        listView = new infinity.ListView($(this), {
-            lazy: function(){
-                $(this).find('.lazy-img').each(function() {
-                    var $ref = $(this);
-                    $ref.attr('src', $ref.attr('data-original'));
-                });
-                // console.log('elem data: ' + getMethods(elem));
-                // console.log('elem attr: ' + elem.getAttribute('data-original'));
-                // $(elem).attr('src', $(elem).attr('data-original'));}
-            }
-        });
-        $(this).data('listView', listView);
-    });
 
     /*
     columns.each(function() {
@@ -428,15 +523,17 @@ $(document).ready(function() {
     // var spinner = $(spinnerTemplate());
     downloadContent();
 
+
     var updateScheduled = false;
-    // var spinner = $('#spinner-div');
+    var spinner = $('#spinner-div');
 
 
+    /*
     var spinnerTemplate = _.template($('#spinner-template').html());
     var spinner = $(spinnerTemplate());
     spinner.insertAfter($('#container'));
     // spinner.insertAfter($('#demo').closest('.row'));
-
+    */
 
 
     $(window).on('scroll', function() {
