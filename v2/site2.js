@@ -129,7 +129,9 @@ function row() {
         // all_grid_element_html.push(grid_elemen);
         // all_grid_element_html = all_grid_element_html + grid_element_html;
         // var html = compiled({'image_url': image_url_medium});
-        var html = '<div><img onclick="openLightBox('+ nextIndexForPhoto +')" class="lazy-img" data-original="' + image_url_medium + '" height="400" width="400" /></div>';
+        var height = Math.round(imageWidth / current.first_image_aspect_ratio);
+        // var height = 400;
+        var html = '<div><img onclick="openLightBox('+ nextIndexForPhoto +')" class="lazy-img" data-original="' + image_url_medium + '" height="'+ height +'" width="' + imageWidth + '" /></div>';
 
         // Append it to the column with the lowest height
         $minCol.data('listView').append(html);
