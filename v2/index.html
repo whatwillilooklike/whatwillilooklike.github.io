@@ -45,6 +45,7 @@
         .image-entry-text {
             text-align: left;
             margin-left: 10px;
+            margin-right: 10px;
         }
 
         .gap-after-image-entry {
@@ -141,8 +142,8 @@
 
     <!-- Metric or English Selector -->
     <div class="input_parameters_boxes">
-        <input type="radio" name="units_radio" id="english_radio" class="radio" value="english" checked/>
-            <label for="english_radio">English</label>
+        <input type="radio" name="units_radio" id="imperial_radio" class="radio" value="imperial" checked/>
+            <label for="imperial_radio">Imperial</label>
         <input type="radio" name="units_radio" id="metric_radio" class="radio" value="metric" />
             <label for="metric_radio">Metric</label>
     </div>
@@ -163,7 +164,9 @@ We have the image entry template here to play around with it
 <script type='text/html' id='image-entry-template'>
     <div class="image-entry-box">
         <img onclick="openLightBox(${index})" class="lazy-img" data-original="${image_url}" height="${image_height}" width="${image_width}" />
-        <div class="image-entry-text">${title}</div>
+        <div class="image-entry-text">
+            <span>${height_str}</span> -- <span>${previous_weight_str}</span> -- <span>${current_weight_str}</span>
+        </div>
     </div>
     <div class="gap-after-image-entry"></div>
 </script>

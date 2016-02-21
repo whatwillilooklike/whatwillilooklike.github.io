@@ -10,9 +10,16 @@ var columnBorderWidth = 20;  // border on each side of a column
 
 var compiledImageEntryTemplate =  _.template($('#image-entry-template').html());
 
-var global_units_imperial = true;
+// var global_units_imperial = true;
+
+var global_min_weight = null;
+var global_max_weight = null;
+var global_min_height = null;
+var global_max_height = null;
 
 var last_selected_weight = null;
+var last_selected_height = null;
+
 var rangeSliderWeight = null;
 var rangeSliderHeight = null;
 
@@ -26,8 +33,12 @@ function InchesToCm(height_in) {
     return height_in * 2.54;
 }
 
+function UnitsAreImperial() {
+    return $("input[name=units_radio]:checked").val() == 'imperial';
+}
+
 function HeightStringFromInt(height_in){
-    if (global_units_imperial) {
+    if (UnitsAreImperial()) {
         var height_obj = InchesToHeightObj(height_in);
         return height_obj.feet.toString() + '&#39;' + height_obj.inches.toString();
     } else {
@@ -36,7 +47,7 @@ function HeightStringFromInt(height_in){
 }
 
 function WeightStringFromWeight(weight_lbs){
-    if (global_units_imperial) {
+    if (UnitsAreImperial()) {
         return weight_lbs.toString() + ' lbs';
     } else {
         return (weight_lbs / 2.2).toFixed(1).toString() + ' kg';
@@ -192,9 +203,11 @@ function row() {
         var image_height = Math.round(imageWidth / current.first_image_aspect_ratio);
         // var height = 400;
         var title = GetStringTitle(current);
-        //var previous_weight = WeightStringFromWeight(current.previous_weight);
-        //var current_weight = WeightStringFromWeight(current.current_weight);
-        var html = compiledImageEntryTemplate({'title': title, 'index': nextIndexForPhoto, 'image_url': image_url_medium, 'image_height': image_height, 'image_width': imageWidth});
+        var previous_weight_str = WeightStringFromWeight(current.previous_weight_lbs);
+        var current_weight_str = WeightStringFromWeight(current.current_weight_lbs);
+        console.log('previous_weight_str: ' + previous_weight_str);
+        var height_str = HeightStringFromInt(current.height_in);
+        var html = compiledImageEntryTemplate({'height_str': height_str, 'previous_weight_str': previous_weight_str, 'current_weight_str': current_weight_str, 'index': nextIndexForPhoto, 'image_url': image_url_medium, 'image_height': image_height, 'image_width': imageWidth});
         // var html = '<div><img onclick="openLightBox('+ nextIndexForPhoto +')" class="lazy-img" data-original="' + image_url_medium + '" height="'+ height +'" width="' + imageWidth + '" /></div>';
 
         // Append it to the column with the lowest height
@@ -310,33 +323,39 @@ function resetBoxes(){
 
 
 
-    /*
+
     // Filter by height
-    var submissionByHeight = submissions.dimension(function(s) {return s.height_in;});
+    // TODO - height filtering isn't working.
+    // See what I did in the other code
 
-    submissionByHeight.filter([global_min_height, global_max_height + 1]); // TODO: add + Math.MIN_VALUE
+    // var submissionByHeight = submissions.dimension(function(s) {return s.height_in;});
+    var submissionsByHeight = submissions.dimension(function(d) { return d.height_in; });
 
-    console.log('global min height= ' + global_min_height);
-    console.log('global max height= ' + global_max_height);
-    */
+
+    var currentSelectedHeight = rangeSliderHeight.noUiSlider.get();
+    var heightApproxRatio = 0.01;
+    var minHeight = Math.floor(currentSelectedHeight * (1 - heightApproxRatio));
+    var maxHeight = Math.round(currentSelectedHeight * (1 + heightApproxRatio));
+
+    submissionsByHeight.filter([minHeight, maxHeight]); // TODO: add + Math.MIN_VALUE
+
+    console.log('submissionsByHeight: ' + JSON.stringify(submissionsByHeight.top(20)));
+
+    console.log('for filtering -- min height= ' + minHeight);
+    console.log('for filtering -- max height= ' + maxHeight);
+
+
+
 
     // Filter by weight
-
+    var approxRatio = 0.03;
     var submissionByCurrentWeight = submissions.dimension(function(s) {return s.current_weight_lbs;});
     var submissionByPreviousWeight = submissions.dimension(function(s) {return s.previous_weight_lbs;});
-    // Get the top weight
-    var topPreviousWeight = submissionByPreviousWeight.top(1)[0].previous_weight_lbs;
-    var topCurrentWeight = submissionByCurrentWeight.top(1)[0].current_weight_lbs;
-
-    var bottomPreviousWeight = submissionByPreviousWeight.bottom(1)[0].previous_weight_lbs;
-    var bottomCurrentWeight = submissionByCurrentWeight.bottom(1)[0].current_weight_lbs;
-
-    var topWeight = Math.max(topPreviousWeight, topCurrentWeight);
-    var bottomWeight = Math.min(bottomPreviousWeight, bottomCurrentWeight);
 
 
-    var selectedTopWeight = rangeSliderWeight.noUiSlider.get();
-    var selectedBottomWeight = rangeSliderWeight.noUiSlider.get();
+    var selectedWeight = rangeSliderWeight.noUiSlider.get();
+    var selectedTopWeight = Math.floor(selectedWeight * (1 + approxRatio));
+    var selectedBottomWeight = Math.ceil(selectedWeight * (1 - approxRatio));
 
     submissionByCurrentWeight.filter([selectedBottomWeight, selectedTopWeight + 1]);
 
@@ -356,14 +375,6 @@ function resetBoxes(){
     filtered_submissions = submissionByScore.top(Infinity);
 
 
-    // Set the slider min and max
-    rangeSliderWeight.noUiSlider.updateOptions({
-        step: 1,
-        range: {
-            'min': bottomWeight,
-            'max': topWeight
-        }
-    });
 
 }
 
@@ -399,15 +410,110 @@ function downloadContent(){
                 raw_data[i]['photos'] = raw_data[i].photos.split(',');
             }
 
-            resetBoxes();
-            drawMoreBoxes();
+            var submissions = crossfilter(raw_data);
+            var submissionByCurrentWeight = submissions.dimension(function(s) {return s.current_weight_lbs;});
+            var submissionByPreviousWeight = submissions.dimension(function(s) {return s.previous_weight_lbs;});
+            // Get the top weight
+            var topPreviousWeight = submissionByPreviousWeight.top(1)[0].previous_weight_lbs;
+            var topCurrentWeight = submissionByCurrentWeight.top(1)[0].current_weight_lbs;
 
+            var bottomPreviousWeight = submissionByPreviousWeight.bottom(1)[0].previous_weight_lbs;
+            var bottomCurrentWeight = submissionByCurrentWeight.bottom(1)[0].current_weight_lbs;
+
+            var submissionsByHeight = submissions.dimension(function(d) { return d.height_in; });
+            // TODO: assumption that there was a result (because we are dereferencing [0]
+
+            global_max_height = submissionsByHeight.top(1)[0].height_in;
+            global_min_height = submissionsByHeight.bottom(1)[0].height_in;
+
+            global_max_weight = Math.max(topPreviousWeight, topCurrentWeight);
+            global_min_weight = Math.min(bottomPreviousWeight, bottomCurrentWeight);
+            console.log('global_min_weight: ' + global_min_weight);
+            console.log('global_max_weight: ' + global_max_weight);
+
+
+            // TODO - set up Slider
+            rangeSliderWeight = document.getElementById('slider-range-weight');
+
+            noUiSlider.create(rangeSliderWeight, {
+                start: [global_min_weight],
+                step: 1,
+                range: {
+                    'min': [ global_min_weight  ],
+                    'max': [ global_max_weight ]
+                }
+            });
+
+
+            rangeSliderWeight.noUiSlider.on('update', function( values, handle ) {
+                // console.log('values: ' + values);
+                // $('#selected_weight').val(values[0]);
+                updateWeightDiv(Math.floor(values[handle]))
+                // rangeSliderValueElement.innerHTML = values[handle];
+
+            });
+
+
+            rangeSliderWeight.noUiSlider.on('set', function( values, handle ) {
+                var selectedWeight = values[handle];
+                console.log('selectedWeight: ' + selectedWeight);
+                if (selectedWeight != last_selected_weight) {
+                    last_selected_weight = selectedWeight;
+                    resetBoxes();
+                    drawMoreBoxes();
+                }
+
+            });
+
+
+
+            // Height
+            rangeSliderHeight = document.getElementById('slider-range-height');
+
+            // TODO - set the real height
+            noUiSlider.create(rangeSliderHeight, {
+                start: [ 48],
+                step: 1,
+                range: {
+                    'min': [  global_min_height ],
+                    'max': [ global_max_height ]
+                }
+            });
+            rangeSliderHeight.noUiSlider.on('update', function( values, handle ) {
+                // console.log('values: ' + values);
+                // $('#selected_weight').val(values[0]);
+                updateHeightDiv(values[handle]);
+                // rangeSliderValueElement.innerHTML = values[handle];
+
+            });
+
+            rangeSliderHeight.noUiSlider.on('set', function( values, handle ) {
+                var selectedHeight = values[handle];
+                console.log('selectedHeight: ' + selectedHeight);
+                if (selectedHeight != last_selected_height) {
+                    last_selected_height = selectedHeight;
+                    resetBoxes();
+                    drawMoreBoxes();
+                }
+            });
 
             // Now that everything is added, NOW call the layout method
+            resetBoxes();
+            drawMoreBoxes();
             // layoutGrid()
 
         }
     });
+}
+
+function updateHeightDiv(height_in) {
+    var rangeSliderValueElement = document.getElementById('selected_height');
+    rangeSliderValueElement.innerHTML = HeightStringFromInt(height_in);
+}
+
+function updateWeightDiv(weight_lbs) {
+    var rangeSliderValueElement = document.getElementById('selected_weight');
+    rangeSliderValueElement.innerHTML = WeightStringFromWeight(weight_lbs);
 }
 
 function onscreen($el) {
@@ -443,63 +549,22 @@ $(document).ready(function() {
         console.log("gender_radio changed");
         resetBoxes();
         drawMoreBoxes();
+        // rangeSliderHeight.noUiSlider.fireEvent('update');
+        // rangeSliderHeight.noUiSlider.set(l;
+        // rangeSliderHeight.noUiSlider.set(last_selected_height);
     });
 
     $("input[name='units_radio']").change(function() {
         console.log("units_radio changed");
-    });
-
-    // TODO - set up Slider
-    rangeSliderWeight = document.getElementById('slider-range-weight');
-
-    noUiSlider.create(rangeSliderWeight, {
-        start: [ 100],
-        step: 1,
-        range: {
-            'min': [  100 ],
-            'max': [ 550 ],
-        }
-    });
-    rangeSliderWeight.noUiSlider.on('update', function( values, handle ) {
-        // console.log('values: ' + values);
-        // $('#selected_weight').val(values[0]);
-        var rangeSliderValueElement = document.getElementById('selected_weight');
-        rangeSliderValueElement.innerHTML = values[handle];
-        // rangeSliderValueElement.innerHTML = values[handle];
-    });
-
-    rangeSliderWeight.noUiSlider.on('set', function( values, handle ) {
-        var selectedWeight = values[handle];
-        console.log('selectedWeight: ' + selectedWeight);
-        if (selectedWeight != last_selected_weight) {
-            last_selected_weight = selectedWeight;
-            resetBoxes();
-            drawMoreBoxes();
-        }
-
+        updateHeightDiv(Math.floor(rangeSliderHeight.noUiSlider.get()));
+        updateWeightDiv(Math.floor(rangeSliderWeight.noUiSlider.get()));
+        // TODO - need to refresh the whole table to support this
+         // rangeSliderHeight.noUiSlider.dispatchEvent('update');
+        // rangeSliderHeight.no
+        // rangeSliderHeight.noUiSlider.set(last_selected_height);
     });
 
 
-    // Height
-    rangeSliderHeight = document.getElementById('slider-range-height');
-
-    noUiSlider.create(rangeSliderHeight, {
-        start: [ 48,  96],
-        step: 1,
-        connect: true,
-        range: {
-            'min': [  48 ],
-            'max': [ 96 ]
-        }
-    });
-    rangeSliderHeight.noUiSlider.on('update', function( values, handle ) {
-        // console.log('values: ' + values);
-        // $('#selected_weight').val(values[0]);
-        var rangeSliderValueElement = document.getElementById('selected_height');
-        rangeSliderValueElement.innerHTML = values[handle];
-        // rangeSliderValueElement.innerHTML = values[handle];
-
-    });
 
 
 
