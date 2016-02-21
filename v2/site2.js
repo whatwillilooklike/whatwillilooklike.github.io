@@ -199,7 +199,7 @@ function downloadContent(){
         skipEmptyLines:true,
         complete: function(results) {
 
-            var LIMIT = 100;  // Just for testing
+            var LIMIT = 10;  // Just for testing
 
 
             // Using JSON
@@ -229,6 +229,11 @@ function downloadContent(){
 
         }
     });
+}
+
+function onscreen($el) {
+    var viewportBottom = $(window).scrollTop() + $(window).height();
+    return $el.offset().top <= viewportBottom;
 }
 
 function getMethods(obj) {
@@ -298,8 +303,33 @@ $(document).ready(function() {
     });
     */
 
-    // Lazy load images
+    // var spinner = $(spinnerTemplate());
     downloadContent();
+
+    var updateScheduled = false;
+    // var spinner = $('#spinner-div');
+
+
+    var spinnerTemplate = _.template($('#spinner-template').html());
+    var spinner = $(spinnerTemplate());
+    spinner.insertAfter($('#container'));
+    // spinner.insertAfter($('#demo').closest('.row'));
+
+
+
+    $(window).on('scroll', function() {
+        if(!updateScheduled) {
+            setTimeout(function() {
+                if(onscreen(spinner)) downloadContent();
+                updateScheduled = false;
+            }, 500);
+            updateScheduled = true;
+        }
+    });
+    
+
+    // Lazy load images
+    // downloadContent();
     // ... When adding new content:
 
 
@@ -310,3 +340,9 @@ $(document).ready(function() {
 
 
 });
+
+
+
+
+
+
