@@ -4,9 +4,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 
-    <!--
-    <script src="lodash.min.js"></script>
-    -->
+
+    <script src="lodash.min.js" defer></script>
+
 
     <style type="text/css">
         /* <![CDATA[ */
@@ -32,7 +32,8 @@
             /*border width is set inside of CSS */
             /*border-width: 20px;*/
             border-style: solid;
-            border-color: yellow;
+            /*border-color: yellow;*/
+            border-color: transparent;
             /*float: left;*/
             display:inline-block;
             vertical-align:top;
@@ -76,6 +77,15 @@
 Lightbox. It's hidden because we click it indirectly.
 
 -->
+
+<!--
+We have the image entry template here to play around with it
+-->
+<script type='text/html' id='image-entry-template'>
+    <div>
+        <img onclick="openLightBox(${index})" class="lazy-img" data-original="${image_url}" height="${height}" width="${width}" />
+    </div>
+</script>
 
 <div id="lightgallery" style="display: none;">
 </div>

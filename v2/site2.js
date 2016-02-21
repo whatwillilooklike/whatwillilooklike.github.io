@@ -7,6 +7,8 @@ var raw_data = null;
 var imageWidth = 400;
 var columnBorderWidth = 20;  // border on each side of a column
 
+var compiledImageEntryTemplate =  _.template($('#image-entry-template').html());
+
 function destroyLightBox() {
     $lg = $("#lightgallery");
     if ($lg.data('lightGallery') === undefined) {
@@ -18,7 +20,10 @@ function destroyLightBox() {
 
 function lightboxImage(image_id, first_image) {
     var image_url = imageUrlForImageID(image_id, 'l');
+    var image_url_thumb = imageUrlForImageID(image_id, 's');
     var $a = $("<a>", {href: image_url});
+    $a.attr('data-exThumbImage', image_url_thumb);
+    console.log('$a: ' + $a.prop('outerHTML'));
     if (first_image == true) {
         $a.attr('id', 'first_image');
     }
@@ -49,7 +54,8 @@ function openLightBox(index) {
     }
     // $lg.html(html);
     $("#lightgallery").lightGallery({
-        'download': false
+        'download': false,
+        'exThumbImage': 'data-exThumbImage'
     });
 
     // Launch Lightbox
@@ -131,7 +137,8 @@ function row() {
         // var html = compiled({'image_url': image_url_medium});
         var height = Math.round(imageWidth / current.first_image_aspect_ratio);
         // var height = 400;
-        var html = '<div><img onclick="openLightBox('+ nextIndexForPhoto +')" class="lazy-img" data-original="' + image_url_medium + '" height="'+ height +'" width="' + imageWidth + '" /></div>';
+        var html = compiledImageEntryTemplate({'index': nextIndexForPhoto, 'image_url': image_url_medium, 'height': height, 'width': imageWidth});
+        // var html = '<div><img onclick="openLightBox('+ nextIndexForPhoto +')" class="lazy-img" data-original="' + image_url_medium + '" height="'+ height +'" width="' + imageWidth + '" /></div>';
 
         // Append it to the column with the lowest height
         $minCol.data('listView').append(html);
