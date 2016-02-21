@@ -207,7 +207,8 @@ function row() {
         var current_weight_str = WeightStringFromWeight(current.current_weight_lbs);
         console.log('previous_weight_str: ' + previous_weight_str);
         var height_str = HeightStringFromInt(current.height_in);
-        var html = compiledImageEntryTemplate({'height_str': height_str, 'previous_weight_str': previous_weight_str, 'current_weight_str': current_weight_str, 'index': nextIndexForPhoto, 'image_url': image_url_medium, 'image_height': image_height, 'image_width': imageWidth});
+        console.log(JSON.stringify(current));
+        var html = compiledImageEntryTemplate({'submission_id': current.id, 'height_str': height_str, 'previous_weight_str': previous_weight_str, 'current_weight_str': current_weight_str, 'index': nextIndexForPhoto, 'image_url': image_url_medium, 'image_height': image_height, 'image_width': imageWidth});
         // var html = '<div><img onclick="openLightBox('+ nextIndexForPhoto +')" class="lazy-img" data-original="' + image_url_medium + '" height="'+ height +'" width="' + imageWidth + '" /></div>';
 
         // Append it to the column with the lowest height
