@@ -42,6 +42,25 @@
             overflow-x: scroll;
         }
 
+        .image-entry-text {
+            text-align: left;
+            margin-left: 10px;
+        }
+
+        .gap-after-image-entry {
+            height: 20px;
+        }
+
+        .image-entry-box {
+            background-color: lightgray;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: sans-serif;
+        }
+
     </style>
 
 
@@ -82,9 +101,11 @@ Lightbox. It's hidden because we click it indirectly.
 We have the image entry template here to play around with it
 -->
 <script type='text/html' id='image-entry-template'>
-    <div>
-        <img onclick="openLightBox(${index})" class="lazy-img" data-original="${image_url}" height="${height}" width="${width}" />
+    <div class="image-entry-box">
+        <img onclick="openLightBox(${index})" class="lazy-img" data-original="${image_url}" height="${image_height}" width="${image_width}" />
+        <div class="image-entry-text">${title}</div>
     </div>
+    <div class="gap-after-image-entry"></div>
 </script>
 
 <div id="lightgallery" style="display: none;">

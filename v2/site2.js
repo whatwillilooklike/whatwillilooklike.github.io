@@ -8,6 +8,44 @@ var imageWidth = 400;
 var columnBorderWidth = 20;  // border on each side of a column
 
 var compiledImageEntryTemplate =  _.template($('#image-entry-template').html());
+var global_units_imperial = true;
+
+
+function InchesToHeightObj(height_in){
+    var feet = Math.floor(height_in / 12);
+    var inches = height_in % 12;
+    return {'feet': feet, 'inches': inches};
+}
+
+function InchesToCm(height_in) {
+    return height_in * 2.54;
+}
+
+function HeightStringFromInt(height_in){
+    if (global_units_imperial) {
+        var height_obj = InchesToHeightObj(height_in);
+        return height_obj.feet.toString() + '&#39;' + height_obj.inches.toString();
+    } else {
+        return InchesToCm(height_in).toFixed(1).toString() + ' cm';
+    }
+}
+
+function WeightStringFromWeight(weight_lbs){
+    if (global_units_imperial) {
+        return weight_lbs.toString() + ' lbs';
+    } else {
+        return (weight_lbs / 2.2).toFixed(1).toString() + ' kg';
+    }
+}
+
+function GetStringTitle(current){
+    // TODO: check to see the previous weight is valid
+    var previous_weight = current.previous_weight_lbs;
+    var current_weight = current.current_weight_lbs;
+
+    return (HeightStringFromInt(current.height_in) + ' / ' +
+    WeightStringFromWeight(previous_weight) + ' &rarr; ' + WeightStringFromWeight(current_weight));
+}
 
 function destroyLightBox() {
     $lg = $("#lightgallery");
@@ -135,9 +173,12 @@ function row() {
         // all_grid_element_html.push(grid_elemen);
         // all_grid_element_html = all_grid_element_html + grid_element_html;
         // var html = compiled({'image_url': image_url_medium});
-        var height = Math.round(imageWidth / current.first_image_aspect_ratio);
+        var image_height = Math.round(imageWidth / current.first_image_aspect_ratio);
         // var height = 400;
-        var html = compiledImageEntryTemplate({'index': nextIndexForPhoto, 'image_url': image_url_medium, 'height': height, 'width': imageWidth});
+        var title = GetStringTitle(current);
+        //var previous_weight = WeightStringFromWeight(current.previous_weight);
+        //var current_weight = WeightStringFromWeight(current.current_weight);
+        var html = compiledImageEntryTemplate({'title': title, 'index': nextIndexForPhoto, 'image_url': image_url_medium, 'image_height': image_height, 'image_width': imageWidth});
         // var html = '<div><img onclick="openLightBox('+ nextIndexForPhoto +')" class="lazy-img" data-original="' + image_url_medium + '" height="'+ height +'" width="' + imageWidth + '" /></div>';
 
         // Append it to the column with the lowest height
