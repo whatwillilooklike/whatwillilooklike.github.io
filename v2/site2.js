@@ -73,7 +73,7 @@ function destroyLightBox() {
 }
 
 function lightboxImage(image_id, first_image) {
-    var image_url = imageUrlForImageID(image_id, 'l');
+    var image_url = imageUrlForImageID(image_id, 'h');
     var image_url_thumb = imageUrlForImageID(image_id, 's');
     var $a = $("<a>", {href: image_url});
     $a.attr('data-exThumbImage', image_url_thumb);
@@ -183,7 +183,7 @@ function row() {
 
         // image_url = image_url.substr(0, image_url.length-4);
         // var image_url_large = image_url + "l.jpg";
-        var image_url_medium = imageUrlForImageID(image_id, 'm');
+        var image_url_medium = imageUrlForImageID(image_id, 'l');  // TODO - rename. It's large instead of medium
         var image_url_small = imageUrlForImageID(image_id, 's');
 
         // TODO - use something cleaner like strcat
