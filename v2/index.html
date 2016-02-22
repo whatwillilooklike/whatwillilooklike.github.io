@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 
-
+    <link href='https://fonts.googleapis.com/css?family=Lato|Montserrat' rel='stylesheet' type='text/css'>
     <script src="lodash.min.js" defer></script>
 
 
@@ -43,9 +43,34 @@
         }
 
         .image-entry-text {
+            /*width:100%;*/
+            font-family: 'Lato', sans-serif;
             text-align: left;
             margin-left: 10px;
             margin-right: 10px;
+        }
+
+        #image-height-box{
+            /*display: inline-block;*/
+            border-right: 1px solid black;
+        }
+
+        #image-previous-weight-box{
+            /*display: inline-block;*/
+            border-right: 1px solid black;
+        }
+
+        #image-current-weight-box{
+            /*display: inline-block;*/
+            /*border-right: 1px solid black;*/
+        }
+
+        #image-url{
+            float:right;
+            text-align: right;
+            /*
+            position:absolute;
+            right:20px;*/
         }
 
         .gap-after-image-entry {
@@ -66,6 +91,7 @@
 
         body {
             font-family: sans-serif;
+            /*font-family: sans-serif;*/
             background-color: #E8E8E8;
             margin: 0;
         }
@@ -80,6 +106,8 @@
         }
 
         #options-wrapper {
+            font-family: 'Lato', sans-serif;
+            font-size: 1.3em;
             background-color: floralwhite;
             -webkit-box-shadow: 0 4px 6px -6px #222;
             -moz-box-shadow: 0 4px 6px -6px #222;
@@ -87,7 +115,12 @@
         }
 
         #title-text {
+            font-family: 'Montserrat', sans-serif;
             font-size: 2em;
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            cursor: default;
         }
 
         input[type="radio"]{
@@ -155,7 +188,7 @@
 
 
 <div id="options-wrapper">
-    <div id="title-text" class="input_parameters_boxes">BodySlides</div>
+    <div id="title-text" class="input_parameters_boxes">BodySwipe</div>
     <!-- Gender Selector -->
     <div class="input_parameters_boxes">
         <input type="radio" name="gender_radio" id="male_radio" class="radio" value="male" />
@@ -204,7 +237,12 @@ We have the image entry template here to play around with it
     <div class="image-entry-box">
         <img onclick="openLightBox(${index})" class="lazy-img" data-original="${image_url}" height="${image_height}" width="${image_width}" />
         <div class="image-entry-text">
-            <span>${height_str}</span> -- <span>${previous_weight_str}</span> -- <span>${current_weight_str}</span><span><a href='http://reddit.com/${submission_id}' target='_blank'>...</a></span>
+            <!--
+            We put the image-url first so we can align it to the right
+            http://stackoverflow.com/questions/4797573/float-right-in-ie7-dropping-to-a-new-line
+            -->
+            <span id="image-url"><a href='http://reddit.com/${submission_id}' target='_blank'>...</a></span>
+            <span id="image-height-box">${height_str}&nbsp;</span><span id="image-previous-weight-box">&nbsp;${previous_weight_str}&nbsp;</span><span id="image-current-weight-box">&nbsp;${current_weight_str}</span>
         </div>
     </div>
     <div class="gap-after-image-entry"></div>

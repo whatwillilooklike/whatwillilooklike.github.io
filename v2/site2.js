@@ -77,7 +77,7 @@ function lightboxImage(image_id, first_image) {
     var image_url_thumb = imageUrlForImageID(image_id, 's');
     var $a = $("<a>", {href: image_url});
     $a.attr('data-exThumbImage', image_url_thumb);
-    console.log('$a: ' + $a.prop('outerHTML'));
+    // console.log('$a: ' + $a.prop('outerHTML'));
     if (first_image == true) {
         $a.attr('id', 'first_image');
     }
@@ -91,7 +91,7 @@ function openLightBox(index) {
     // alert('images: ' + JSON.stringify(raw_data[index].photos));
 
     // Just in case:
-    console.log('openLightBox called with index = ' + index);
+    // console.log('openLightBox called with index = ' + index);
     destroyLightBox();
 
     // Build lightbox
@@ -205,9 +205,9 @@ function row() {
         var title = GetStringTitle(current);
         var previous_weight_str = WeightStringFromWeight(current.previous_weight_lbs);
         var current_weight_str = WeightStringFromWeight(current.current_weight_lbs);
-        console.log('previous_weight_str: ' + previous_weight_str);
+        // console.log('previous_weight_str: ' + previous_weight_str);
         var height_str = HeightStringFromInt(current.height_in);
-        console.log(JSON.stringify(current));
+        // console.log(JSON.stringify(current));
         var html = compiledImageEntryTemplate({'submission_id': current.id, 'height_str': height_str, 'previous_weight_str': previous_weight_str, 'current_weight_str': current_weight_str, 'index': nextIndexForPhoto, 'image_url': image_url_medium, 'image_height': image_height, 'image_width': imageWidth});
         // var html = '<div><img onclick="openLightBox('+ nextIndexForPhoto +')" class="lazy-img" data-original="' + image_url_medium + '" height="'+ height +'" width="' + imageWidth + '" /></div>';
 
@@ -248,7 +248,7 @@ function resetBoxes(){
     // Function that is called when any of the filtering or options are set.
     resetSpinner();
 
-    console.log('resetBoxes called!');
+    //console.log('resetBoxes called!');
     // Reset Columns Views
     // columns = $('.infinite');
 
@@ -261,12 +261,12 @@ function resetBoxes(){
     }
 
 
-    console.log('windowWidth: ' + $( window ).width());
+    //console.log('windowWidth: ' + $( window ).width());
     // console.log('documentWidth: ' + $( document ).width());
 
     var num_columns = Math.max(1, Math.floor($(window).width() / (imageWidth + 2 * columnBorderWidth)));
     // var num_columns = 2;
-    console.log('num_columns: ' + num_columns);
+    //console.log('num_columns: ' + num_columns);
     $('#float-wrap').html('');  // Clear the container for the infinite columns
     for (var i = 0; i < num_columns; i++) {
         var $div = $("<div>", {class: "infinite infinite-scroll-column"});
@@ -340,10 +340,10 @@ function resetBoxes(){
 
     submissionsByHeight.filter([minHeight, maxHeight]); // TODO: add + Math.MIN_VALUE
 
-    console.log('submissionsByHeight: ' + JSON.stringify(submissionsByHeight.top(20)));
+    //console.log('submissionsByHeight: ' + JSON.stringify(submissionsByHeight.top(20)));
 
-    console.log('for filtering -- min height= ' + minHeight);
-    console.log('for filtering -- max height= ' + maxHeight);
+    //console.log('for filtering -- min height= ' + minHeight);
+    //console.log('for filtering -- max height= ' + maxHeight);
 
 
 
@@ -435,8 +435,8 @@ function downloadContent(){
 
             global_max_weight = Math.max(topPreviousWeight, topCurrentWeight);
             global_min_weight = Math.min(bottomPreviousWeight, bottomCurrentWeight);
-            console.log('global_min_weight: ' + global_min_weight);
-            console.log('global_max_weight: ' + global_max_weight);
+            //console.log('global_min_weight: ' + global_min_weight);
+            //console.log('global_max_weight: ' + global_max_weight);
 
 
             // TODO - set up Slider
@@ -447,7 +447,9 @@ function downloadContent(){
                 step: 5,
                 range: {
                     'min': [ round5(global_min_weight)  ],
-                    'max': [ round5(global_max_weight) ]
+                    'max': [ round5(global_max_weight) ],
+                    '70%': [250], // Hack for now
+                    '90%': [400]
                 }
             });
 
@@ -463,7 +465,7 @@ function downloadContent(){
 
             rangeSliderWeight.noUiSlider.on('set', function( values, handle ) {
                 var selectedWeight = values[handle];
-                console.log('selectedWeight: ' + selectedWeight);
+                // console.log('selectedWeight: ' + selectedWeight);
                 if (selectedWeight != last_selected_weight) {
                     last_selected_weight = selectedWeight;
                     resetBoxes();
@@ -483,7 +485,7 @@ function downloadContent(){
                 step: 1,
                 range: {
                     'min': [  global_min_height ],
-                    'max': [ global_max_height ]
+                    'max': [ global_max_height ],
                 }
             });
             rangeSliderHeight.noUiSlider.on('update', function( values, handle ) {
@@ -496,7 +498,7 @@ function downloadContent(){
 
             rangeSliderHeight.noUiSlider.on('set', function( values, handle ) {
                 var selectedHeight = values[handle];
-                console.log('selectedHeight: ' + selectedHeight);
+                // console.log('selectedHeight: ' + selectedHeight);
                 if (selectedHeight != last_selected_height) {
                     last_selected_height = selectedHeight;
                     resetBoxes();
@@ -543,7 +545,7 @@ function getMethods(obj) {
 }
 
 $(document).ready(function() {
-    console.log('hello!');
+    // console.log('hello!');
     // var $el = $('#my-infinite-container');
 
     // TODO - set gender and english radio
@@ -553,7 +555,7 @@ $(document).ready(function() {
     $('input:radio[name=units_radio]')[0].checked = true;  // select english by default
 
     $("input[name='gender_radio']").change(function() {
-        console.log("gender_radio changed");
+        // console.log("gender_radio changed");
         resetBoxes();
         drawMoreBoxes();
         // rangeSliderHeight.noUiSlider.fireEvent('update');
@@ -562,9 +564,11 @@ $(document).ready(function() {
     });
 
     $("input[name='units_radio']").change(function() {
-        console.log("units_radio changed");
+        // console.log("units_radio changed");
         updateHeightDiv(Math.floor(rangeSliderHeight.noUiSlider.get()));
         updateWeightDiv(Math.floor(rangeSliderWeight.noUiSlider.get()));
+        resetBoxes();
+        drawMoreBoxes();
         // TODO - need to refresh the whole table to support this
          // rangeSliderHeight.noUiSlider.dispatchEvent('update');
         // rangeSliderHeight.no
