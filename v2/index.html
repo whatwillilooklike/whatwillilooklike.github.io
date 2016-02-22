@@ -46,23 +46,28 @@
             /*width:100%;*/
             font-family: 'Lato', sans-serif;
             text-align: left;
+            /*
             margin-left: 10px;
             margin-right: 10px;
+            */
         }
 
         #image-height-box{
             /*display: inline-block;*/
-            border-right: 1px solid black;
+            /*background-color: #e1edf7;*/
+            border-right: 1px solid lightgray;
         }
 
         #image-previous-weight-box{
             /*display: inline-block;*/
-            border-right: 1px solid black;
+            border-right: 1px solid lightgray;
+            /*background-color: #eed3d7;*/
         }
 
         #image-current-weight-box{
             /*display: inline-block;*/
             /*border-right: 1px solid black;*/
+            /*background-color: #a9dba9;*/
         }
 
         #image-url{
@@ -189,6 +194,7 @@
 
 <div id="options-wrapper">
     <div id="title-text" class="input_parameters_boxes">BodySwipe</div>
+    <br/>
     <!-- Gender Selector -->
     <div class="input_parameters_boxes">
         <input type="radio" name="gender_radio" id="male_radio" class="radio" value="male" />
@@ -241,8 +247,8 @@ We have the image entry template here to play around with it
             We put the image-url first so we can align it to the right
             http://stackoverflow.com/questions/4797573/float-right-in-ie7-dropping-to-a-new-line
             -->
-            <span id="image-url"><a href='http://reddit.com/${submission_id}' target='_blank'>...</a></span>
-            <span id="image-height-box">${height_str}&nbsp;</span><span id="image-previous-weight-box">&nbsp;${previous_weight_str}&nbsp;</span><span id="image-current-weight-box">&nbsp;${current_weight_str}</span>
+            <span id="image-url"><a href='http://reddit.com/${submission_id}' target='_blank'>...</a>&nbsp;&nbsp;</span>
+            <span id="image-height-box">&nbsp;&nbsp;${height_str}&nbsp;</span><span id="image-previous-weight-box">&nbsp;${previous_weight_str}&nbsp;</span><span id="image-current-weight-box">&nbsp;${current_weight_str}</span>
         </div>
     </div>
     <div class="gap-after-image-entry"></div>
