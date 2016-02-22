@@ -349,14 +349,15 @@ function resetBoxes(){
 
 
     // Filter by weight
-    var approxRatio = 0.03;
+    // var approxRatio = 0.03;
     var submissionByCurrentWeight = submissions.dimension(function(s) {return s.current_weight_lbs;});
     var submissionByPreviousWeight = submissions.dimension(function(s) {return s.previous_weight_lbs;});
 
 
+    var weightMargin = 5;
     var selectedWeight = rangeSliderWeight.noUiSlider.get();
-    var selectedTopWeight = Math.floor(selectedWeight * (1 + approxRatio));
-    var selectedBottomWeight = Math.ceil(selectedWeight * (1 - approxRatio));
+    var selectedTopWeight = Math.round(selectedWeight + weightMargin);
+    var selectedBottomWeight = Math.round(selectedWeight - weightMargin);
 
     submissionByCurrentWeight.filter([selectedBottomWeight, selectedTopWeight + 1]);
 
@@ -384,6 +385,11 @@ function drawMoreBoxes(){
     for (var i = 0; i < LIMIT; i ++ ) {
         row();
     }
+}
+
+function round5(x)
+{
+    return Math.round(x/5)*5;
 }
 
 function downloadContent(){
@@ -437,11 +443,11 @@ function downloadContent(){
             rangeSliderWeight = document.getElementById('slider-range-weight');
 
             noUiSlider.create(rangeSliderWeight, {
-                start: [global_min_weight],
-                step: 1,
+                start: [135],  // TODO - currently arbitrary default weight
+                step: 5,
                 range: {
-                    'min': [ global_min_weight  ],
-                    'max': [ global_max_weight ]
+                    'min': [ round5(global_min_weight)  ],
+                    'max': [ round5(global_max_weight) ]
                 }
             });
 
@@ -473,7 +479,7 @@ function downloadContent(){
 
             // TODO - set the real height
             noUiSlider.create(rangeSliderHeight, {
-                start: [ 48],
+                start: [ 64],  // TODO -currently arbitrarily default height
                 step: 1,
                 range: {
                     'min': [  global_min_height ],

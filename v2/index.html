@@ -53,13 +53,21 @@
         }
 
         .image-entry-box {
-            background-color: lightgray;
+            background-color: white;
             border-radius: 10px;
             overflow: hidden;
+            /*background-color: #ddd;*/
+            box-shadow: 0px 3px 6px gray;
+            /*
+            -10px 8px 15px gray, 10px 8px 15px gray;
+            */
+
         }
 
         body {
             font-family: sans-serif;
+            background-color: #E8E8E8;
+            margin: 0;
         }
 
         .input_parameters_boxes {
@@ -72,7 +80,14 @@
         }
 
         #options-wrapper {
-            background-color: lightyellow;
+            background-color: floralwhite;
+            -webkit-box-shadow: 0 4px 6px -6px #222;
+            -moz-box-shadow: 0 4px 6px -6px #222;
+            box-shadow: 0 4px 6px -6px #222;
+        }
+
+        #title-text {
+            font-size: 2em;
         }
 
         input[type="radio"]{
@@ -81,6 +96,24 @@
 
         input[type="radio"]+label{
             cursor: pointer;
+        }
+
+        hr {
+
+            /*
+            height: 6px;
+
+            border: 0;
+            box-shadow: inset 0 6px 6px -6px black;
+            */
+            border: 0;
+            height: 1px;
+            background: #333;
+            background-image: -webkit-linear-gradient(left, #ccc, #333, #ccc);
+            background-image:    -moz-linear-gradient(left, #ccc, #333, #ccc);
+            background-image:     -ms-linear-gradient(left, #ccc, #333, #ccc);
+            background-image:      -o-linear-gradient(left, #ccc, #333, #ccc);
+
         }
 
         input[type="radio"]:not(:checked)+label{ color: lightgray; }
@@ -119,31 +152,39 @@
 
 </head>
 <body>
-<h1>fitspire.me</h1>
+
 
 <div id="options-wrapper">
+    <div id="title-text" class="input_parameters_boxes">BodySlides</div>
+    <!-- Gender Selector -->
+    <div class="input_parameters_boxes">
+        <input type="radio" name="gender_radio" id="male_radio" class="radio" value="male" />
+        <label id="male_radio_label" for="male_radio"><i class="fa fa-mars fa-2x"></i></label>
+        &nbsp;
+        <input type="radio" name="gender_radio" id="female_radio" class="radio" value="female" checked/>
+        <label id="female_radio_label" for="female_radio"><i class="fa fa-venus fa-2x"></i></label>
+    </div>
+
+    <!-- Weight Range Slider -->
     <div id="weight-wrapper" class="input_parameters_boxes" style="width:300px;">
         <div id="slider-range-weight"></div>
         <br/>
         <div id="selected_weight" style="text-align: center;">hello</div>
     </div>
+
+    <!-- Height Range Slider -->
     <div id="height-wrapper" class="input_parameters_boxes" style="width:300px;">
         <div id="slider-range-height"></div>
         <br/>
         <div id="selected_height" style="text-align: center;">hello</div>
     </div>
-    <!-- Gender Selector -->
-    <div class="input_parameters_boxes">
-        <input type="radio" name="gender_radio" id="male_radio" class="radio" value="male" />
-            <label id="male_radio_label" for="male_radio"><i class="fa fa-mars fa-2x"></i></label>
-        <input type="radio" name="gender_radio" id="female_radio" class="radio" value="female" checked/>
-            <label id="female_radio_label" for="female_radio"><i class="fa fa-venus fa-2x"></i></label>
-    </div>
+
 
     <!-- Metric or English Selector -->
     <div class="input_parameters_boxes">
         <input type="radio" name="units_radio" id="imperial_radio" class="radio" value="imperial" checked/>
             <label for="imperial_radio">Imperial</label>
+        &nbsp;
         <input type="radio" name="units_radio" id="metric_radio" class="radio" value="metric" />
             <label for="metric_radio">Metric</label>
     </div>
@@ -151,8 +192,6 @@
 </div>
 
 <br/>
-<br/>
-<hr/>
 <!--
 Lightbox. It's hidden because we click it indirectly.
 
