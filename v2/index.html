@@ -7,6 +7,11 @@
     <link href='https://fonts.googleapis.com/css?family=Lato|Montserrat' rel='stylesheet' type='text/css'>
     <script src="lodash.min.js" defer></script>
 
+    <!-- Start Vex -->
+    <link rel="stylesheet" href="vex.css" />
+    <link rel="stylesheet" href="vex-theme-default.css" />
+    <!-- End Vex -->
+
 
     <style type="text/css">
         /* <![CDATA[ */
@@ -106,7 +111,7 @@
             vertical-align:top;
             border-style: solid;
             border-color:transparent;
-            border-width: 20px;
+            border-width: 12px;
             vertical-align: top;
         }
 
@@ -162,6 +167,7 @@
     <link href="nouislider.css" rel="stylesheet">
     <script src="nouislider.min.js" defer></script>
     <script src="jquery-2.2.0.min.js" defer></script>
+    <script src="vex.combined.min.js" defer></script>
     <script src="crossfilter.min.js" defer></script>
 
     <!--
@@ -184,50 +190,51 @@
     <link rel="stylesheet" href="font-awesome.min.css">
 
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <title>BodySwipe</title>
+    <title>VisualBMI - See what weight looks like on a human body</title>
 
 
 
 </head>
 <body>
 
-
 <div id="options-wrapper">
-    <div id="title-text" class="input_parameters_boxes">BodySwipe</div>
+    <div id="title-text" class="input_parameters_boxes">VisualBMI</div>
     <!-- Gender Selector -->
-    <div class="input_parameters_boxes">
+    <div style="display: inline-block;">
+    <span class="input_parameters_boxes">
         <input type="radio" name="gender_radio" id="male_radio" class="radio" value="male" />
         <label id="male_radio_label" for="male_radio"><i class="fa fa-mars fa-2x"></i></label>
         &nbsp;
         <input type="radio" name="gender_radio" id="female_radio" class="radio" value="female" checked/>
         <label id="female_radio_label" for="female_radio"><i class="fa fa-venus fa-2x"></i></label>
-    </div>
+    </span>
 
     <!-- Weight Range Slider -->
-    <div id="weight-wrapper" class="input_parameters_boxes" style="width:300px;">
+    <span id="weight-wrapper" class="input_parameters_boxes" style="width:300px;">
         <div id="slider-range-weight"></div>
         <br/>
         <div id="selected_weight" style="text-align: center;">hello</div>
-    </div>
+    </span>
 
     <!-- Height Range Slider -->
-    <div id="height-wrapper" class="input_parameters_boxes" style="width:300px;">
+    <span id="height-wrapper" class="input_parameters_boxes" style="width:300px;">
         <div id="slider-range-height"></div>
         <br/>
         <div id="selected_height" style="text-align: center;">hello</div>
-    </div>
+    </span>
 
 
     <!-- Metric or English Selector -->
-    <div class="input_parameters_boxes">
+    <span class="input_parameters_boxes">
         <input type="radio" name="units_radio" id="imperial_radio" class="radio" value="imperial" checked/>
             <label for="imperial_radio">Imperial</label>
         &nbsp;
         <input type="radio" name="units_radio" id="metric_radio" class="radio" value="metric" />
             <label for="metric_radio">Metric</label>
-    </div>
+    </span>
 
-    <div class="input_parameters_boxes"><i class="fa fa-question-circle fa-2x"></i></div>
+    <span class="input_parameters_boxes"><i class="fa fa-question-circle fa-2x" onclick="showInfoDialog();"></i></span>
+    </div>
 
 </div>
 

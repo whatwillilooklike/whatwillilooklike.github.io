@@ -134,6 +134,15 @@ function resetSpinner(){
     $('#spinner-div').html("<img src='spinner.gif' class=spinner alt='Loading...'>");
 }
 
+function showInfoDialog(){
+    // vex.defaultOptions.className = 'vex-theme-os';
+
+    vex.dialog.alert({
+        message: 'Testing the wireframe theme.',
+        // className: 'vex-theme-wireframe'
+    });
+}
+
 function row() {
     var colIndex, length, $minCol, $currCol;
     for (var i = 0, length = columns.length; i < length; i++) {// for(index = 0, length = columns.length; index < length; index++) {
@@ -544,7 +553,9 @@ function getMethods(obj) {
     return result;
 }
 
+
 $(document).ready(function() {
+    vex.defaultOptions.className = 'vex-theme-os';
     // console.log('hello!');
     // var $el = $('#my-infinite-container');
 
